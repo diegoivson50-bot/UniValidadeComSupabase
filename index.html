@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniValidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #1F36C7;
+    --azul-claro: #4A63E7;
+    --fundo: #F5F7FF;
+    --card: #FFFFFF;
+    --texto: #1A1A2E;
+    --cinza: #8A8FA3;
+    --vermelho: #E53935;
+    --amarelo: #FFB300;
+    --verde: #43A047;
+    --sombra: 0 4px 16px rgba(31,54,199,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    padding-bottom: 90px;
+    min-height: 100vh;
+  }
+  h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+
+  .tela { display: none; padding: 20px; }
+  .tela.ativa { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .login-wrap {
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 100vh; padding: 24px;
+  }
+  .logo { text-align: center; margin-bottom: 32px; }
+  .logo img {
+    width: clamp(240px, 55vw, 420px);
+    max-height: 200px;
+    height: auto;
+    margin: 0 auto 20px;
+    display: block;
+    object-fit: contain;
+  }
+  .header-topo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .header-topo img {
+    width: clamp(80px, 22vw, 130px);
+    height: auto;
+    display: block;
+  }
+  .header-topo .header-texto h2 { font-size: 20px; }
+  .header-topo .header-texto .sub {
+    color: var(--cinza);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .logo-circle {
+    width: 80px; height: 80px; margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    border-radius: 24px; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; box-shadow: var(--sombra);
+  }
+  .logo h1 { font-size: 26px; color: var(--azul); }
+  .logo p { color: var(--cinza); font-size: 14px; margin-top: 4px; }
+
+  .campo { margin-bottom: 16px; }
+  .campo label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--texto); margin-bottom: 6px;
+  }
+  .campo input, .campo select {
+    width: 100%; padding: 14px 16px; border: 2px solid #E4E8F5;
+    border-radius: 14px; font-size: 15px; font-family: inherit;
+    background: var(--card); transition: .2s;
+  }
+  .campo input:focus, .campo select:focus {
+    outline: none; border-color: var(--azul-claro);
+    box-shadow: 0 0 0 4px rgba(74,99,231,.1);
+  }
+
+  .btn {
+    width: 100%; padding: 16px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    color: white; font-size: 16px; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: .2s; box-shadow: 0 6px 16px rgba(31,54,199,.25);
+  }
+  .btn:active { transform: scale(.97); }
+
+  .header { margin-bottom: 20px; }
+  .header h2 { font-size: 22px; }
+  .header .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
+
+  .resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .card-resumo {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 12px 6px;
+    text-align: center;
+    box-shadow: var(--sombra);
+    border-top: 4px solid var(--azul);
+    min-height: 78px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
+    transition: .2s;
+    position: relative;
+    user-select: none;
+  }
+  .card-resumo:active { transform: scale(.96); }
+  .card-resumo.ativo {
+    background: #EEF1FF;
+    box-shadow: 0 0 0 2px var(--azul), var(--sombra);
+  }
+  .card-resumo.ativo::after {
+    content: "✓";
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--azul);
+  }
+  .card-resumo .num {
+    font-family: 'Poppins';
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--azul);
+    line-height: 1.1;
+  }
+  .card-resumo .lbl {
+    font-size: 10px;
+    color: var(--cinza);
+    margin-top: 4px;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+  .card-resumo.cat-bpc { border-top-color: #1F36C7; }
+  .card-resumo.cat-bpc .num { color: #1F36C7; }
+  .card-resumo.cat-hc { border-top-color: #2196F3; }
+  .card-resumo.cat-hc .num { color: #2196F3; }
+  .card-resumo.cat-maionese { border-top-color: #FBC02D; }
+  .card-resumo.cat-maionese .num { color: #F9A825; }
+  .card-resumo.cat-outros-molhos { border-top-color: #FB8C00; }
+  .card-resumo.cat-outros-molhos .num { color: #EF6C00; }
+  .card-resumo.cat-caldo { border-top-color: #FFA726; }
+  .card-resumo.cat-caldo .num { color: #F57C00; }
+  .card-resumo.cat-tempero { border-top-color: #E53935; }
+  .card-resumo.cat-tempero .num { color: #E53935; }
+  .card-resumo.cat-amido { border-top-color: #43A047; }
+  .card-resumo.cat-amido .num { color: #43A047; }
+  .card-resumo.cat-complemento { border-top-color: #E91E63; }
+  .card-resumo.cat-complemento .num { color: #E91E63; }
+  .card-resumo.cat-food { border-top-color: #00ACC1; }
+  .card-resumo.cat-food .num { color: #00ACC1; }
+
+  .filtro-ativo {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: #EEF1FF;
+    border: 2px solid var(--azul);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--azul);
+  }
+  .filtro-ativo.visivel { display: flex; }
+  .filtro-ativo button {
+    background: var(--azul);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .grupo-categoria { margin-bottom: 20px; animation: fade .3s ease; }
+  .grupo-categoria-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px; padding: 0 4px;
+  }
+  .grupo-categoria-header .barra-cor {
+    width: 4px; height: 20px; border-radius: 2px;
+    background: var(--azul); flex-shrink: 0;
+  }
+  .grupo-categoria-header h3 { font-size: 15px; flex: 1; }
+  .grupo-categoria-header .qtd-badge {
+    font-size: 11px; font-weight: 700;
+    background: #EEF1FF; color: var(--azul);
+    padding: 2px 8px; border-radius: 8px;
+  }
+  .grupo-categoria-header.bpc .barra-cor { background: #1F36C7; }
+  .grupo-categoria-header.bpc .qtd-badge { background: #E3E9FF; color: #1F36C7; }
+  .grupo-categoria-header.hc .barra-cor { background: #2196F3; }
+  .grupo-categoria-header.hc .qtd-badge { background: #E3F2FD; color: #1976D2; }
+  .grupo-categoria-header.maionese .barra-cor { background: #FBC02D; }
+  .grupo-categoria-header.maionese .qtd-badge { background: #FFF9C4; color: #F57F17; }
+  .grupo-categoria-header.outros-molhos .barra-cor { background: #FB8C00; }
+  .grupo-categoria-header.outros-molhos .qtd-badge { background: #FFF3E0; color: #E65100; }
+  .grupo-categoria-header.caldo .barra-cor { background: #FFA726; }
+  .grupo-categoria-header.caldo .qtd-badge { background: #FFF3E0; color: #EF6C00; }
+  .grupo-categoria-header.tempero .barra-cor { background: #E53935; }
+  .grupo-categoria-header.tempero .qtd-badge { background: #FFEBEE; color: #C62828; }
+  .grupo-categoria-header.amido .barra-cor { background: #43A047; }
+  .grupo-categoria-header.amido .qtd-badge { background: #E8F5E9; color: #2E7D32; }
+  .grupo-categoria-header.complemento .barra-cor { background: #E91E63; }
+  .grupo-categoria-header.complemento .qtd-badge { background: #FCE4EC; color: #C2185B; }
+  .grupo-categoria-header.food .barra-cor { background: #00ACC1; }
+  .grupo-categoria-header.food .qtd-badge { background: #E0F7FA; color: #00838F; }
+
+  .produto {
+    background: var(--card); border-radius: 18px; padding: 14px;
+    margin-bottom: 12px; box-shadow: var(--sombra);
+    display: flex; gap: 14px; align-items: center;
+    border-left: 5px solid var(--verde); position: relative;
+  }
+  .produto.alerta { border-left-color: var(--amarelo); }
+  .produto.vencido { border-left-color: var(--vermelho); }
+  .produto .icone-produto {
+    width: 58px; height: 58px; border-radius: 12px;
+    background: #EEF1FB; display: flex; align-items: center;
+    justify-content: center; font-size: 24px; flex-shrink: 0;
+  }
+  .produto .info { flex: 1; min-width: 0; padding-right: 24px; }
+  .produto .nome { font-weight: 600; font-size: 15px; margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .produto .marca-gram { font-size: 12px; color: var(--cinza); margin-bottom: 6px; }
+  .produto .dias { font-size: 12px; font-weight: 600; }
+  .produto .dias.ok { color: var(--verde); }
+  .produto .dias.alerta { color: var(--amarelo); }
+  .produto .dias.vencido { color: var(--vermelho); }
+  .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+
+  .qtd-control {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+    background: #F0F2FA; border-radius: 10px; padding: 3px;
+  }
+  .qtd-control button {
+    width: 28px; height: 28px; border: none; border-radius: 8px;
+    background: var(--card); color: var(--azul); font-size: 16px;
+    font-weight: 700; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .qtd-control button:active { transform: scale(.92); }
+  .qtd-control .qtd-val {
+    min-width: 26px; text-align: center; font-size: 13px; font-weight: 700;
+    color: var(--texto);
+  }
+
+  .produto .del {
+    position: absolute; top: 10px; right: 10px; background: #FFEBEE;
+    border: none; color: var(--vermelho); width: 28px; height: 28px;
+    border-radius: 8px; font-size: 16px; cursor: pointer;
+  }
+
+  .vazio { text-align: center; padding: 60px 20px; color: var(--cinza); }
+  .vazio .emoji { font-size: 48px; margin-bottom: 12px; }
+
+  .fab {
+    position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px;
+    border-radius: 20px; border: none; background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    color: white; font-size: 30px; cursor: pointer; box-shadow: 0 8px 20px rgba(31,54,199,.4);
+    display: flex; align-items: center; justify-content: center; transition: .2s;
+  }
+  .fab:active { transform: scale(.9); }
+
+  .nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+    display: flex; padding: 10px 0 14px; box-shadow: 0 -4px 16px rgba(0,0,0,.05);
+    z-index: 10;
+  }
+  .nav button {
+    flex: 1; background: none; border: none; font-family: inherit;
+    font-size: 11px; color: var(--cinza); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .nav button .icone { font-size: 20px; }
+  .nav button.ativo { color: var(--azul); font-weight: 600; }
+
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(20,25,50,.5);
+    display: none; align-items: flex-end; z-index: 100;
+  }
+  .modal-bg.aberto { display: flex; }
+  .modal {
+    background: var(--card); width: 100%; border-radius: 24px 24px 0 0;
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    max-height: 90vh; overflow-y: auto;
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+  .modal h3 { font-size: 19px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+  .modal .fechar { background: #F0F2FA; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+
+  .grupo-cats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+  }
+  .cat-btn {
+    padding: 12px 6px; border: 2px solid #E4E8F5; background: var(--card);
+    border-radius: 12px; font-family: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: .2s; text-align: center;
+  }
+  .cat-btn.sel { border-color: var(--azul); background: #EEF1FF; color: var(--azul); }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; z-index: 200; transition: .3s;
+    box-shadow: 0 8px 20px rgba(67,160,71,.3);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ========== TELA LOGIN ========== -->
+<div id="telaLogin" class="tela ativa">
+  <div class="login-wrap">
+    <div class="logo">
+      <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
+      <p>Sua melhor forma de controlar a validade dos seus produtos!</p>
+    </div>
+
+    <div id="camposCadastro" style="display: none;">
+      <div class="campo">
+        <label>Nome do Promotor</label>
+        <input id="inNome" placeholder="Ex: João Silva">
+      </div>
+      <div class="campo">
+        <label>RE</label>
+        <input id="inRE" placeholder="Ex: 12345">
+      </div>
+      <div class="campo">
+        <label>Loja</label>
+        <input id="inLoja" placeholder="Ex: Supermercado Bom Preço">
+      </div>
+      <div class="campo">
+        <label>Cidade</label>
+        <input id="inCidade" placeholder="Ex: São Paulo">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>E-mail</label>
+      <input id="inEmail" type="email" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input id="inSenha" type="password" placeholder="Sua senha">
+    </div>
+
+    <button class="btn" id="btnAuth" onclick="fazerLogin()">Entrar no Sistema →</button>
+
+    <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--cinza);">
+      <a href="#" id="linkAlternar" onclick="alternarModo()" style="color: var(--azul); font-weight: 600;">Criar conta</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========== TELA DASHBOARD ========== -->
+<div id="telaDash" class="tela">
+  <div class="header-topo">
+    <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
+    <div class="header-texto">
+      <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
+      <p class="sub" id="saudLoja">—</p>
+    </div>
+  </div>
+
+  <div class="resumo" id="cardsCategorias"></div>
+
+  <div class="filtro-ativo" id="filtroAtivo">
+    <span id="filtroAtivoTexto">Filtrando: —</span>
+    <button onclick="limparFiltro()">✕ Limpar</button>
+  </div>
+
+  <div class="header" style="margin-bottom:12px">
+    <h2 style="font-size:17px">Produtos cadastrados</h2>
+  </div>
+  <div id="listaProdutos"></div>
+</div>
+
+<!-- ========== BOTÃO FLUTUANTE ========== -->
+<button class="fab" id="fab" onclick="abrirModal()" style="display:none">+</button>
+
+<!-- ========== NAV INFERIOR ========== -->
+<div class="nav" id="nav" style="display:none">
+  <button class="ativo">
+    <span class="icone">🏠</span> Início
+  </button>
+  <button onclick="sair()">
+    <span class="icone">🚪</span> Sair
+  </button>
+</div>
+
+<!-- ========== MODAL CADASTRO ========== -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>Novo Produto <button class="fechar" onclick="fecharModal()">✕</button></h3>
+
+    <div class="campo">
+      <label>Nome do Produto</label>
+      <input id="inProduto" placeholder="Ex: Maionese Hellmann's">
+    </div>
+
+    <div class="campo">
+      <label>Marca</label>
+      <input id="inMarca" placeholder="Ex: Hellmann's">
+    </div>
+
+    <div class="campo">
+      <label>Gramatura / Volume</label>
+      <input id="inGramatura" placeholder="Ex: 500g, 1kg, 900ml">
+    </div>
+
+    <div class="campo">
+      <label>Quantidade em estoque</label>
+      <input id="inQuantidade" type="number" min="1" value="1">
+    </div>
+
+    <div class="campo">
+      <label>Categoria</label>
+      <div class="grupo-cats" id="grupoCats"></div>
+    </div>
+
+    <div class="campo">
+      <label>Data de Validade</label>
+      <input type="date" id="inValidade">
+    </div>
+
+    <button class="btn" onclick="salvarProduto()">💾 Salvar Produto</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Produto salvo!</div>
+
+<script>
+// ========== INICIALIZAR SUPABASE ==========
+const { createClient } = supabase;
+const supabaseClient = createClient(
+  'https://ztdsbnpcyjcwcolhzlgv.supabase.co',
+  'sb_publishable_Ef3dvtXXkDdN_Pm3lZjTfw_IAkLzr35'
+);
+
+// ========== ESTADO GLOBAL ==========
+const CATEGORIAS = [
+  { nome: 'BPC', slug: 'bpc' },
+  { nome: 'HC', slug: 'hc' },
+  { nome: 'Maionese', slug: 'maionese' },
+  { nome: 'Outros Molhos', slug: 'outros-molhos' },
+  { nome: 'Caldo', slug: 'caldo' },
+  { nome: 'Tempero', slug: 'tempero' },
+  { nome: 'Amido', slug: 'amido' },
+  { nome: 'Complemento Alimentar', slug: 'complemento' },
+  { nome: 'Food Solution', slug: 'food' }
+];
+
+const ORDEM_COR = { vencido: 0, alerta: 1, ok: 2 };
+
+let promotor = null;
+let produtos = [];
+let categoriaSelecionada = null;
+let filtroCategoria = null;
+let modoCadastro = false;
+
+// ========== AUTENTICAÇÃO ==========
+function alternarModo() {
+  modoCadastro = !modoCadastro;
+  document.getElementById('camposCadastro').style.display = modoCadastro ? 'block' : 'none';
+  document.getElementById('btnAuth').textContent = modoCadastro ? 'Criar Conta' : 'Entrar no Sistema →';
+  document.getElementById('linkAlternar').textContent = modoCadastro ? 'Já tenho conta' : 'Criar conta';
+  document.getElementById('btnAuth').onclick = modoCadastro ? fazerCadastro : fazerLogin;
+}
+
+async function fazerLogin() {
+  const email = document.getElementById('inEmail').value.trim();
+  const senha = document.getElementById('inSenha').value;
+
+  if (!email || !senha) {
+    mostrarToast('Preencha e-mail e senha', '#E53935');
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: senha,
+  });
+
+  if (error) {
+    mostrarToast('Erro: ' + error.message, '#E53935');
+    return;
+  }
+
+  await iniciarDashboard(data.user);
+}
+
+async function fazerCadastro() {
+  const email = document.getElementById('inEmail').value.trim();
+  const senha = document.getElementById('inSenha').value;
+  const nome = document.getElementById('inNome').value.trim();
+  const re = document.getElementById('inRE').value.trim();
+  const loja = document.getElementById('inLoja').value.trim();
+  const cidade = document.getElementById('inCidade').value.trim();
+
+  if (!email || !senha || !nome || !loja || !cidade) {
+    mostrarToast('Preencha todos os campos obrigatórios', '#E53935');
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: senha,
+    options: {
+      data: { nome, re, loja, cidade }
+    }
+  });
+
+  if (error) {
+    mostrarToast('Erro ao criar conta: ' + error.message, '#E53935');
+    return;
+  }
+
+  if (data.user && !data.session) {
+    mostrarToast('Conta criada! Verifique seu e-mail para confirmar.', '#FFB300');
+    alternarModo();
+    return;
+  }
+
+  await iniciarDashboard(data.user);
+}
+
+async function iniciarDashboard(user) {
+  const meta = user.user_metadata || {};
+
+  promotor = {
+    nome: meta.nome || 'Promotor',
+    re: meta.re || '',
+    loja: meta.loja || 'Loja',
+    cidade: meta.cidade || 'Cidade'
+  };
+
+  document.getElementById('saudNome').textContent = promotor.nome.split(' ')[0];
+  document.getElementById('saudLoja').textContent = `${promotor.loja} • ${promotor.cidade}`;
+
+  document.getElementById('telaLogin').classList.remove('ativa');
+  document.getElementById('telaDash').classList.add('ativa');
+  document.getElementById('fab').style.display = 'flex';
+  document.getElementById('nav').style.display = 'flex';
+
+  await carregarProdutos();
+}
+
+async function sair() {
+  await supabaseClient.auth.signOut();
+  location.reload();
+}
+
+// ========== PRODUTOS (SUPABASE) ==========
+async function carregarProdutos() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    mostrarToast('Sessão expirada. Faça login.', '#E53935');
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('produtos')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('validade', { ascending: true });
+
+  if (error) {
+    console.error('Erro ao carregar:', error);
+    mostrarToast('Erro ao carregar produtos', '#E53935');
+    return;
+  }
+
+  produtos = data || [];
+  renderizar();
+}
+
+async function salvarProduto() {
+  const nome = document.getElementById('inProduto').value.trim();
+  const marca = document.getElementById('inMarca').value.trim();
+  const gramatura = document.getElementById('inGramatura').value.trim();
+  const quantidade = parseInt(document.getElementById('inQuantidade').value) || 1;
+  const validade = document.getElementById('inValidade').value;
+
+  if (!nome || !validade || !categoriaSelecionada) {
+    mostrarToast('Preencha nome, categoria e validade', '#E53935');
+    return;
+  }
+
+  if (!promotor) {
+    mostrarToast('Sessão não carregada. Recarregue a página.', '#E53935');
+    return;
+  }
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    mostrarToast('Sessão expirada. Faça login.', '#E53935');
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('produtos')
+    .insert([{
+      nome,
+      marca,
+      gramatura,
+      quantidade,
+      categoria: categoriaSelecionada,
+      validade,
+      promotor: promotor.nome,
+      loja: promotor.loja,
+      cidade: promotor.cidade,
+      user_id: user.id
+    }]);
+
+  if (error) {
+    console.error('Erro ao salvar:', error);
+    mostrarToast('Erro ao salvar produto', '#E53935');
+    return;
+  }
+
+  fecharModal();
+  mostrarToast('✓ Produto cadastrado!');
+  await carregarProdutos();
+}
+
+async function alterarQtd(id, delta) {
+  const produto = produtos.find(p => String(p.id) === String(id));
+  if (!produto) return;
+
+  const novaQtd = Math.max(1, (produto.quantidade || 1) + delta);
+
+  const { error } = await supabaseClient
+    .from('produtos')
+    .update({ quantidade: novaQtd })
+    .eq('id', id);
+
+  if (error) {
+    mostrarToast('Erro ao atualizar', '#E53935');
+    return;
+  }
+
+  await carregarProdutos();
+}
+
+async function excluir(id) {
+  if (!confirm('Excluir este produto?')) return;
+
+  const { error } = await supabaseClient
+    .from('produtos')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    mostrarToast('Erro ao excluir', '#E53935');
+    return;
+  }
+
+  await carregarProdutos();
+  mostrarToast('Produto removido');
+}
+
+// ========== UI DO MODAL ==========
+function montarCategorias() {
+  const grupo = document.getElementById('grupoCats');
+  grupo.innerHTML = CATEGORIAS.map(c =>
+    `<button type="button" class="cat-btn" data-cat="${c.nome}" onclick="selCat(this)">${c.nome}</button>`
+  ).join('');
+}
+
+function abrirModal() {
+  document.getElementById('modalBg').classList.add('aberto');
+  document.getElementById('inProduto').value = '';
+  document.getElementById('inMarca').value = '';
+  document.getElementById('inGramatura').value = '';
+  document.getElementById('inQuantidade').value = '1';
+  document.getElementById('inValidade').value = '';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  categoriaSelecionada = null;
+}
+
+function fecharModal() {
+  document.getElementById('modalBg').classList.remove('aberto');
+}
+
+function selCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  categoriaSelecionada = btn.dataset.cat;
+}
+
+// ========== FILTROS E RENDERIZAÇÃO ==========
+function filtrarPorCategoria(nomeCategoria) {
+  filtroCategoria = (filtroCategoria === nomeCategoria) ? null : nomeCategoria;
+  renderizar();
+}
+
+function limparFiltro() {
+  filtroCategoria = null;
+  renderizar();
+}
+
+function diasRestantes(dataValidade) {
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const alvo = new Date(dataValidade + 'T00:00:00');
+  return Math.ceil((alvo - hoje) / 86400000);
+}
+
+function classeDias(dias) {
+  if (dias > 30) return 'ok';
+  if (dias > 15) return 'alerta';
+  return 'vencido';
+}
+
+function textoDias(dias) {
+  if (dias < 0) return `⚠️ Vencido há ${Math.abs(dias)} dia(s)`;
+  if (dias === 0) return `⚠️ Vence hoje!`;
+  if (dias === 1) return `Vence amanhã`;
+  return `Faltam ${dias} dias`;
+}
+
+function renderCardsCategorias(meus) {
+  document.getElementById('cardsCategorias').innerHTML = CATEGORIAS.map(c => {
+    const total = meus.filter(p => p.categoria === c.nome).length;
+    const ativo = filtroCategoria === c.nome ? ' ativo' : '';
+    return `<div class="card-resumo cat-${c.slug}${ativo}" onclick="filtrarPorCategoria('${c.nome}')">
+      <div class="num">${total}</div>
+      <div class="lbl">${c.nome}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderizar() {
+  const lista = document.getElementById('listaProdutos');
+  const meus = produtos;
+
+  renderCardsCategorias(meus);
+
+  const barraFiltro = document.getElementById('filtroAtivo');
+  if (filtroCategoria) {
+    barraFiltro.classList.add('visivel');
+    document.getElementById('filtroAtivoTexto').textContent = `Filtrando: ${filtroCategoria}`;
+  } else {
+    barraFiltro.classList.remove('visivel');
+  }
+
+  const filtrados = filtroCategoria ? meus.filter(p => p.categoria === filtroCategoria) : meus;
+
+  if (filtrados.length === 0) {
+    lista.innerHTML = `<div class="vazio">
+      <div class="emoji">📦</div>
+      <p>${filtroCategoria ? `Nenhum produto em ${filtroCategoria}.` : 'Nenhum produto cadastrado ainda.'}</p>
+      <p style="font-size:13px;margin-top:6px">${filtroCategoria ? 'Limpe o filtro ou cadastre um novo.' : 'Toque no botão <b>+</b> para começar'}</p>
+    </div>`;
+    return;
+  }
+
+  const grupos = CATEGORIAS
+    .map(cat => ({ ...cat, itens: filtrados.filter(p => p.categoria === cat.nome) }))
+    .filter(g => g.itens.length > 0);
+
+  grupos.forEach(g => {
+    g.itens.sort((a, b) => {
+      const da = diasRestantes(a.validade);
+      const db = diasRestantes(b.validade);
+      const corA = ORDEM_COR[classeDias(da)];
+      const corB = ORDEM_COR[classeDias(db)];
+      if (corA !== corB) return corA - corB;
+      return da - db;
+    });
+  });
+
+  grupos.sort((a, b) => {
+    const urgA = Math.min(...a.itens.map(p => ORDEM_COR[classeDias(diasRestantes(p.validade))]));
+    const urgB = Math.min(...b.itens.map(p => ORDEM_COR[classeDias(diasRestantes(p.validade))]));
+    if (urgA !== urgB) return urgA - urgB;
+    const minA = Math.min(...a.itens.map(p => diasRestantes(p.validade)));
+    const minB = Math.min(...b.itens.map(p => diasRestantes(p.validade)));
+    return minA - minB;
+  });
+
+  lista.innerHTML = grupos.map(g => `<div class="grupo-categoria">
+    <div class="grupo-categoria-header ${g.slug}">
+      <div class="barra-cor"></div>
+      <h3>${g.nome}</h3>
+      <span class="qtd-badge">${g.itens.length}</span>
+    </div>
+    ${g.itens.map(p => renderProduto(p)).join('')}
+  </div>`).join('');
+}
+
+function renderProduto(p) {
+  const dias = diasRestantes(p.validade);
+  const cls = classeDias(dias);
+  const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
+  const qtd = p.quantidade || 1;
+  const marcaGram = [p.marca, p.gramatura].filter(Boolean).join(' • ');
+  return `<div class="produto ${cls}">
+    <div class="icone-produto">📦</div>
+    <div class="info">
+      <div class="nome">${p.nome}</div>
+      ${marcaGram ? `<div class="marca-gram">${marcaGram}</div>` : ''}
+      <div class="dias ${cls}">${textoDias(dias)}</div>
+      <div class="data">Validade: ${dataFmt}</div>
+      <div class="qtd-control">
+        <button onclick="alterarQtd('${p.id}', -1)">−</button>
+        <span class="qtd-val">${qtd}</span>
+        <button onclick="alterarQtd('${p.id}', +1)">+</button>
+      </div>
+    </div>
+    <button class="del" onclick="excluir('${p.id}')">✕</button>
+  </div>`;
+}
+
+// ========== TOAST ==========
+function mostrarToast(msg, cor = '#43A047') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = cor;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ========== INICIALIZAÇÃO ==========
+window.onload = async () => {
+  montarCategorias();
+
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      await iniciarDashboard(session.user);
+    }
+  } catch (e) {
+    console.error('Erro ao restaurar sessão:', e);
+  }
+};
+</script>
+</body>
+</html>
