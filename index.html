@@ -476,8 +476,6 @@ const CATEGORIAS = [
   { nome: 'Food Solution', slug: 'food' }
 ];
 
-const ORDEM_COR = { vencido: 0, alerta: 1, ok: 2 };
-
 let promotor = null;
 let produtos = [];
 let categoriaSelecionada = null;
@@ -781,38 +779,13 @@ function renderizar() {
     return;
   }
 
-  const grupos = CATEGORIAS
-    .map(cat => ({ ...cat, itens: filtrados.filter(p => p.categoria === cat.nome) }))
-    .filter(g => g.itens.length > 0);
+  // Ordena globalmente pela data de validade mais próxima
+  const ordenados = [...filtrados].sort(
+    (a, b) => diasRestantes(a.validade) - diasRestantes(b.validade)
+  );
 
-  grupos.forEach(g => {
-    g.itens.sort((a, b) => {
-      const da = diasRestantes(a.validade);
-      const db = diasRestantes(b.validade);
-      const corA = ORDEM_COR[classeDias(da)];
-      const corB = ORDEM_COR[classeDias(db)];
-      if (corA !== corB) return corA - corB;
-      return da - db;
-    });
-  });
-
-  grupos.sort((a, b) => {
-    const urgA = Math.min(...a.itens.map(p => ORDEM_COR[classeDias(diasRestantes(p.validade))]));
-    const urgB = Math.min(...b.itens.map(p => ORDEM_COR[classeDias(diasRestantes(p.validade))]));
-    if (urgA !== urgB) return urgA - urgB;
-    const minA = Math.min(...a.itens.map(p => diasRestantes(p.validade)));
-    const minB = Math.min(...b.itens.map(p => diasRestantes(p.validade)));
-    return minA - minB;
-  });
-
-  lista.innerHTML = grupos.map(g => `<div class="grupo-categoria">
-    <div class="grupo-categoria-header ${g.slug}">
-      <div class="barra-cor"></div>
-      <h3>${g.nome}</h3>
-      <span class="qtd-badge">${g.itens.length}</span>
-    </div>
-    ${g.itens.map(p => renderProduto(p)).join('')}
-  </div>`).join('');
+  // Lista única, sem agrupamento por categoria
+  lista.innerHTML = ordenados.map(p => renderProduto(p)).join('');
 }
 
 function renderProduto(p) {
@@ -826,6 +799,7 @@ function renderProduto(p) {
     <div class="info">
       <div class="nome">${p.nome}</div>
       ${marcaGram ? `<div class="marca-gram">${marcaGram}</div>` : ''}
+      <div class="marca-gram" style="color:var(--azul);font-weight:600">${p.categoria}</div>
       <div class="dias ${cls}">${textoDias(dias)}</div>
       <div class="data">Validade: ${dataFmt}</div>
       <div class="qtd-control">
