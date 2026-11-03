@@ -100,6 +100,12 @@
     cursor: pointer; transition: .2s; box-shadow: 0 6px 16px rgba(31,54,199,.25);
   }
   .btn:active { transform: scale(.97); }
+  .btn.secundario {
+    background: #EEF1FF;
+    color: var(--azul);
+    box-shadow: none;
+    margin-top: 10px;
+  }
 
   .header { margin-bottom: 20px; }
   .header h2 { font-size: 22px; }
@@ -306,6 +312,14 @@
     box-shadow: 0 8px 20px rgba(67,160,71,.3);
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .secao-titulo {
+    font-size: 15px;
+    margin: 24px 0 12px;
+    color: var(--texto);
+    padding-bottom: 6px;
+    border-bottom: 2px solid #E4E8F5;
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -351,6 +365,9 @@
 
     <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--cinza);">
       <a href="#" id="linkAlternar" onclick="alternarModo()" style="color: var(--azul); font-weight: 600;">Criar conta</a>
+    </p>
+    <p style="text-align: center; margin-top: 8px; font-size: 14px;">
+      <a href="#" onclick="pedirReset()" style="color: var(--cinza);">Esqueci minha senha</a>
     </p>
   </div>
 </div>
@@ -407,6 +424,19 @@
   </div>
 
   <button class="btn" onclick="salvarPerfil()">💾 Salvar Alterações</button>
+
+  <h3 class="secao-titulo">🔒 Alterar Senha</h3>
+
+  <div class="campo">
+    <label>Nova Senha</label>
+    <input id="perfilNovaSenha" type="password" placeholder="Mínimo 6 caracteres">
+  </div>
+  <div class="campo">
+    <label>Confirmar Nova Senha</label>
+    <input id="perfilNovaSenha2" type="password" placeholder="Repita a nova senha">
+  </div>
+
+  <button class="btn secundario" onclick="alterarSenhaPerfil()">🔑 Alterar Senha</button>
 </div>
 
 <!-- ========== BOTÃO FLUTUANTE ========== -->
@@ -503,6 +533,24 @@
   </div>
 </div>
 
+<!-- ========== MODAL RESET DE SENHA (link de e-mail) ========== -->
+<div class="modal-bg" id="modalResetBg">
+  <div class="modal">
+    <h3>Definir Nova Senha <button class="fechar" onclick="fecharReset()">✕</button></h3>
+
+    <div class="campo">
+      <label>Nova Senha</label>
+      <input id="inNovaSenha" type="password" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="campo">
+      <label>Confirmar Nova Senha</label>
+      <input id="inNovaSenha2" type="password" placeholder="Repita a nova senha">
+    </div>
+
+    <button class="btn" onclick="confirmarNovaSenha()">💾 Salvar Nova Senha</button>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Produto salvo!</div>
 
 <script>
@@ -525,6 +573,8 @@ const CATEGORIAS = [
   { nome: 'Complemento Alimentar', slug: 'complemento' },
   { nome: 'Food Solution', slug: 'food' }
 ];
+
+const REDIRECT_RESET = 'https://diegoivson50-bot.github.io/UniValidadeComSupabase/?reset=true';
 
 let promotor = null;
 let emailUsuario = null;
@@ -630,6 +680,84 @@ async function sair() {
   location.reload();
 }
 
+// ========== RESET DE SENHA (via e-mail) ==========
+async function pedirReset() {
+  const email = document.getElementById('inEmail').value.trim();
+  if (!email) {
+    mostrarToast('Digite seu e-mail no campo acima primeiro.', '#FFB300');
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: REDIRECT_RESET
+  });
+
+  if (error) {
+    mostrarToast('Erro: ' + error.message, '#E53935');
+    return;
+  }
+  mostrarToast('Link enviado! Verifique seu e-mail.', '#43A047');
+}
+
+function fecharReset() {
+  document.getElementById('modalResetBg').classList.remove('aberto');
+  window.history.replaceState({}, document.title, window.location.pathname);
+  location.reload();
+}
+
+async function confirmarNovaSenha() {
+  const novaSenha = document.getElementById('inNovaSenha').value;
+  const confirmacao = document.getElementById('inNovaSenha2').value;
+
+  if (!novaSenha || novaSenha.length < 6) {
+    mostrarToast('A senha deve ter pelo menos 6 caracteres.', '#E53935');
+    return;
+  }
+  if (novaSenha !== confirmacao) {
+    mostrarToast('As senhas não coincidem.', '#E53935');
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({ password: novaSenha });
+
+  if (error) {
+    mostrarToast('Erro: ' + error.message, '#E53935');
+    return;
+  }
+
+  mostrarToast('Senha atualizada! Faça login.', '#43A047');
+  document.getElementById('modalResetBg').classList.remove('aberto');
+  window.history.replaceState({}, document.title, window.location.pathname);
+  await supabaseClient.auth.signOut();
+  location.reload();
+}
+
+// ========== ALTERAR SENHA (aba Perfil, usuário logado) ==========
+async function alterarSenhaPerfil() {
+  const novaSenha = document.getElementById('perfilNovaSenha').value;
+  const confirmacao = document.getElementById('perfilNovaSenha2').value;
+
+  if (!novaSenha || novaSenha.length < 6) {
+    mostrarToast('A senha deve ter pelo menos 6 caracteres.', '#E53935');
+    return;
+  }
+  if (novaSenha !== confirmacao) {
+    mostrarToast('As senhas não coincidem.', '#E53935');
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({ password: novaSenha });
+
+  if (error) {
+    mostrarToast('Erro: ' + error.message, '#E53935');
+    return;
+  }
+
+  document.getElementById('perfilNovaSenha').value = '';
+  document.getElementById('perfilNovaSenha2').value = '';
+  mostrarToast('✓ Senha alterada com sucesso!');
+}
+
 // ========== NAVEGAÇÃO ENTRE TELAS ==========
 function setNavAtivo(qual) {
   document.getElementById('navInicio').classList.toggle('ativo', qual === 'inicio');
@@ -657,6 +785,8 @@ function preencherPerfil() {
   document.getElementById('perfilLoja').value = promotor?.loja || '';
   document.getElementById('perfilCidade').value = promotor?.cidade || '';
   document.getElementById('perfilEmail').value = emailUsuario || '';
+  document.getElementById('perfilNovaSenha').value = '';
+  document.getElementById('perfilNovaSenha2').value = '';
 }
 
 async function salvarPerfil() {
@@ -986,6 +1116,12 @@ window.onload = async () => {
   montarCategorias();
 
   try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reset') === 'true') {
+      document.getElementById('modalResetBg').classList.add('aberto');
+      return;
+    }
+
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
       await iniciarDashboard(session.user);
