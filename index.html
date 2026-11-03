@@ -87,6 +87,11 @@
     outline: none; border-color: var(--azul-claro);
     box-shadow: 0 0 0 4px rgba(74,99,231,.1);
   }
+  .campo input:disabled {
+    background: #F0F2FA;
+    color: var(--cinza);
+    cursor: not-allowed;
+  }
 
   .btn {
     width: 100%; padding: 16px; border: none; border-radius: 14px;
@@ -373,13 +378,47 @@
   <div id="listaProdutos"></div>
 </div>
 
+<!-- ========== TELA PERFIL ========== -->
+<div id="telaPerfil" class="tela">
+  <div class="header">
+    <h2>Meu Perfil</h2>
+    <p class="sub">Altere suas informações (o e-mail não pode ser modificado)</p>
+  </div>
+
+  <div class="campo">
+    <label>Nome do Promotor</label>
+    <input id="perfilNome" placeholder="Ex: João Silva">
+  </div>
+  <div class="campo">
+    <label>RE</label>
+    <input id="perfilRE" placeholder="Ex: 12345">
+  </div>
+  <div class="campo">
+    <label>Loja</label>
+    <input id="perfilLoja" placeholder="Ex: Supermercado Bom Preço">
+  </div>
+  <div class="campo">
+    <label>Cidade</label>
+    <input id="perfilCidade" placeholder="Ex: São Paulo">
+  </div>
+  <div class="campo">
+    <label>E-mail (não editável)</label>
+    <input id="perfilEmail" type="email" disabled>
+  </div>
+
+  <button class="btn" onclick="salvarPerfil()">💾 Salvar Alterações</button>
+</div>
+
 <!-- ========== BOTÃO FLUTUANTE ========== -->
 <button class="fab" id="fab" onclick="abrirModal()" style="display:none">+</button>
 
 <!-- ========== NAV INFERIOR ========== -->
 <div class="nav" id="nav" style="display:none">
-  <button class="ativo">
+  <button id="navInicio" class="ativo" onclick="irParaInicio()">
     <span class="icone">🏠</span> Início
+  </button>
+  <button id="navPerfil" onclick="irParaPerfil()">
+    <span class="icone">👤</span> Perfil
   </button>
   <button onclick="sair()">
     <span class="icone">🚪</span> Sair
@@ -488,6 +527,7 @@ const CATEGORIAS = [
 ];
 
 let promotor = null;
+let emailUsuario = null;
 let produtos = [];
 let categoriaSelecionada = null;
 let categoriaEdicao = null;
@@ -570,14 +610,17 @@ async function iniciarDashboard(user) {
     loja: meta.loja || 'Loja',
     cidade: meta.cidade || 'Cidade'
   };
+  emailUsuario = user.email || '';
 
   document.getElementById('saudNome').textContent = promotor.nome.split(' ')[0];
   document.getElementById('saudLoja').textContent = `${promotor.loja} • ${promotor.cidade}`;
 
   document.getElementById('telaLogin').classList.remove('ativa');
   document.getElementById('telaDash').classList.add('ativa');
+  document.getElementById('telaPerfil').classList.remove('ativa');
   document.getElementById('fab').style.display = 'flex';
   document.getElementById('nav').style.display = 'flex';
+  setNavAtivo('inicio');
 
   await carregarProdutos();
 }
@@ -585,6 +628,64 @@ async function iniciarDashboard(user) {
 async function sair() {
   await supabaseClient.auth.signOut();
   location.reload();
+}
+
+// ========== NAVEGAÇÃO ENTRE TELAS ==========
+function setNavAtivo(qual) {
+  document.getElementById('navInicio').classList.toggle('ativo', qual === 'inicio');
+  document.getElementById('navPerfil').classList.toggle('ativo', qual === 'perfil');
+}
+
+function irParaInicio() {
+  document.getElementById('telaPerfil').classList.remove('ativa');
+  document.getElementById('telaDash').classList.add('ativa');
+  document.getElementById('fab').style.display = 'flex';
+  setNavAtivo('inicio');
+}
+
+function irParaPerfil() {
+  document.getElementById('telaDash').classList.remove('ativa');
+  document.getElementById('telaPerfil').classList.add('ativa');
+  document.getElementById('fab').style.display = 'none';
+  setNavAtivo('perfil');
+  preencherPerfil();
+}
+
+function preencherPerfil() {
+  document.getElementById('perfilNome').value = promotor?.nome || '';
+  document.getElementById('perfilRE').value = promotor?.re || '';
+  document.getElementById('perfilLoja').value = promotor?.loja || '';
+  document.getElementById('perfilCidade').value = promotor?.cidade || '';
+  document.getElementById('perfilEmail').value = emailUsuario || '';
+}
+
+async function salvarPerfil() {
+  const nome = document.getElementById('perfilNome').value.trim();
+  const re = document.getElementById('perfilRE').value.trim();
+  const loja = document.getElementById('perfilLoja').value.trim();
+  const cidade = document.getElementById('perfilCidade').value.trim();
+
+  if (!nome || !loja || !cidade) {
+    mostrarToast('Preencha nome, loja e cidade', '#E53935');
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.updateUser({
+    data: { nome, re, loja, cidade }
+  });
+
+  if (error) {
+    console.error('Erro ao atualizar perfil:', error);
+    mostrarToast('Erro ao salvar perfil', '#E53935');
+    return;
+  }
+
+  promotor = { nome, re, loja, cidade };
+
+  document.getElementById('saudNome').textContent = promotor.nome.split(' ')[0];
+  document.getElementById('saudLoja').textContent = `${promotor.loja} • ${promotor.cidade}`;
+
+  mostrarToast('✓ Perfil atualizado!');
 }
 
 // ========== PRODUTOS (SUPABASE) ==========
