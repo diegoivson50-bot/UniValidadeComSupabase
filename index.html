@@ -195,83 +195,55 @@
     cursor: pointer;
   }
 
-  .grupo-categoria { margin-bottom: 20px; animation: fade .3s ease; }
-  .grupo-categoria-header {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 10px; padding: 0 4px;
-  }
-  .grupo-categoria-header .barra-cor {
-    width: 4px; height: 20px; border-radius: 2px;
-    background: var(--azul); flex-shrink: 0;
-  }
-  .grupo-categoria-header h3 { font-size: 15px; flex: 1; }
-  .grupo-categoria-header .qtd-badge {
-    font-size: 11px; font-weight: 700;
-    background: #EEF1FF; color: var(--azul);
-    padding: 2px 8px; border-radius: 8px;
-  }
-  .grupo-categoria-header.bpc .barra-cor { background: #1F36C7; }
-  .grupo-categoria-header.bpc .qtd-badge { background: #E3E9FF; color: #1F36C7; }
-  .grupo-categoria-header.hc .barra-cor { background: #2196F3; }
-  .grupo-categoria-header.hc .qtd-badge { background: #E3F2FD; color: #1976D2; }
-  .grupo-categoria-header.maionese .barra-cor { background: #FBC02D; }
-  .grupo-categoria-header.maionese .qtd-badge { background: #FFF9C4; color: #F57F17; }
-  .grupo-categoria-header.outros-molhos .barra-cor { background: #FB8C00; }
-  .grupo-categoria-header.outros-molhos .qtd-badge { background: #FFF3E0; color: #E65100; }
-  .grupo-categoria-header.caldo .barra-cor { background: #FFA726; }
-  .grupo-categoria-header.caldo .qtd-badge { background: #FFF3E0; color: #EF6C00; }
-  .grupo-categoria-header.tempero .barra-cor { background: #E53935; }
-  .grupo-categoria-header.tempero .qtd-badge { background: #FFEBEE; color: #C62828; }
-  .grupo-categoria-header.amido .barra-cor { background: #43A047; }
-  .grupo-categoria-header.amido .qtd-badge { background: #E8F5E9; color: #2E7D32; }
-  .grupo-categoria-header.complemento .barra-cor { background: #E91E63; }
-  .grupo-categoria-header.complemento .qtd-badge { background: #FCE4EC; color: #C2185B; }
-  .grupo-categoria-header.food .barra-cor { background: #00ACC1; }
-  .grupo-categoria-header.food .qtd-badge { background: #E0F7FA; color: #00838F; }
-
   .produto {
-    background: var(--card); border-radius: 18px; padding: 14px;
+    background: var(--card); border-radius: 18px; padding: 14px 44px 44px 18px;
     margin-bottom: 12px; box-shadow: var(--sombra);
-    display: flex; gap: 14px; align-items: center;
     border-left: 5px solid var(--verde); position: relative;
+    animation: fade .3s ease;
   }
   .produto.alerta { border-left-color: var(--amarelo); }
   .produto.vencido { border-left-color: var(--vermelho); }
-  .produto .icone-produto {
-    width: 58px; height: 58px; border-radius: 12px;
-    background: #EEF1FB; display: flex; align-items: center;
-    justify-content: center; font-size: 24px; flex-shrink: 0;
+
+  .produto .cat-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #EEF1FF;
+    color: var(--azul);
+    margin-bottom: 6px;
   }
-  .produto .info { flex: 1; min-width: 0; padding-right: 24px; }
   .produto .nome { font-weight: 600; font-size: 15px; margin-bottom: 4px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .produto .marca-gram { font-size: 12px; color: var(--cinza); margin-bottom: 6px; }
+  .produto .unidades { font-size: 12px; color: var(--cinza); margin-bottom: 6px; }
   .produto .dias { font-size: 12px; font-weight: 600; }
   .produto .dias.ok { color: var(--verde); }
   .produto .dias.alerta { color: var(--amarelo); }
   .produto .dias.vencido { color: var(--vermelho); }
   .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
 
-  .qtd-control {
-    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
-    background: #F0F2FA; border-radius: 10px; padding: 3px;
+  .btn-excluir {
+    position: absolute; top: 10px; right: 10px;
+    background: #FFEBEE; border: none; color: var(--vermelho);
+    width: 32px; height: 32px; border-radius: 8px;
+    font-size: 16px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: .2s;
   }
-  .qtd-control button {
-    width: 28px; height: 28px; border: none; border-radius: 8px;
-    background: var(--card); color: var(--azul); font-size: 16px;
-    font-weight: 700; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08);
-  }
-  .qtd-control button:active { transform: scale(.92); }
-  .qtd-control .qtd-val {
-    min-width: 26px; text-align: center; font-size: 13px; font-weight: 700;
-    color: var(--texto);
-  }
+  .btn-excluir:active { transform: scale(.9); }
 
-  .produto .del {
-    position: absolute; top: 10px; right: 10px; background: #FFEBEE;
-    border: none; color: var(--vermelho); width: 28px; height: 28px;
-    border-radius: 8px; font-size: 16px; cursor: pointer;
+  .btn-editar {
+    position: absolute; bottom: 10px; right: 10px;
+    background: #EEF1FF; border: none; color: var(--azul);
+    width: 36px; height: 36px; border-radius: 10px;
+    font-size: 16px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: .2s; box-shadow: 0 2px 6px rgba(31,54,199,.15);
   }
+  .btn-editar:active { transform: scale(.9); }
 
   .vazio { text-align: center; padding: 60px 20px; color: var(--cinza); }
   .vazio .emoji { font-size: 48px; margin-bottom: 12px; }
@@ -430,8 +402,8 @@
     </div>
 
     <div class="campo">
-      <label>Gramatura / Volume</label>
-      <input id="inGramatura" placeholder="Ex: 500g, 1kg, 900ml">
+      <label>Gramatura / Volume / Unidades</label>
+      <input id="inGramatura" placeholder="Ex: 500g, 1kg, 30 unidades">
     </div>
 
     <div class="campo">
@@ -450,6 +422,45 @@
     </div>
 
     <button class="btn" onclick="salvarProduto()">💾 Salvar Produto</button>
+  </div>
+</div>
+
+<!-- ========== MODAL EDIÇÃO ========== -->
+<div class="modal-bg" id="modalEdicaoBg">
+  <div class="modal">
+    <h3>Editar Produto <button class="fechar" onclick="fecharEdicao()">✕</button></h3>
+
+    <div class="campo">
+      <label>Nome do Produto</label>
+      <input id="editProduto" placeholder="Ex: Maionese Hellmann's">
+    </div>
+
+    <div class="campo">
+      <label>Marca</label>
+      <input id="editMarca" placeholder="Ex: Hellmann's">
+    </div>
+
+    <div class="campo">
+      <label>Gramatura / Volume / Unidades</label>
+      <input id="editGramatura" placeholder="Ex: 500g, 1kg, 30 unidades">
+    </div>
+
+    <div class="campo">
+      <label>Quantidade em estoque</label>
+      <input id="editQuantidade" type="number" min="1">
+    </div>
+
+    <div class="campo">
+      <label>Categoria</label>
+      <div class="grupo-cats" id="grupoCatsEdicao"></div>
+    </div>
+
+    <div class="campo">
+      <label>Data de Validade</label>
+      <input type="date" id="editValidade">
+    </div>
+
+    <button class="btn" onclick="salvarEdicao()">💾 Salvar Alterações</button>
   </div>
 </div>
 
@@ -479,8 +490,10 @@ const CATEGORIAS = [
 let promotor = null;
 let produtos = [];
 let categoriaSelecionada = null;
+let categoriaEdicao = null;
 let filtroCategoria = null;
 let modoCadastro = false;
+let produtoEditandoId = null;
 
 // ========== AUTENTICAÇÃO ==========
 function alternarModo() {
@@ -647,25 +660,6 @@ async function salvarProduto() {
   await carregarProdutos();
 }
 
-async function alterarQtd(id, delta) {
-  const produto = produtos.find(p => String(p.id) === String(id));
-  if (!produto) return;
-
-  const novaQtd = Math.max(1, (produto.quantidade || 1) + delta);
-
-  const { error } = await supabaseClient
-    .from('produtos')
-    .update({ quantidade: novaQtd })
-    .eq('id', id);
-
-  if (error) {
-    mostrarToast('Erro ao atualizar', '#E53935');
-    return;
-  }
-
-  await carregarProdutos();
-}
-
 async function excluir(id) {
   if (!confirm('Excluir este produto?')) return;
 
@@ -683,11 +677,84 @@ async function excluir(id) {
   mostrarToast('Produto removido');
 }
 
+// ========== EDIÇÃO ==========
+function abrirEdicao(id) {
+  const produto = produtos.find(p => String(p.id) === String(id));
+  if (!produto) return;
+
+  produtoEditandoId = produto.id;
+  categoriaEdicao = produto.categoria;
+
+  document.getElementById('editProduto').value = produto.nome || '';
+  document.getElementById('editMarca').value = produto.marca || '';
+  document.getElementById('editGramatura').value = produto.gramatura || '';
+  document.getElementById('editQuantidade').value = produto.quantidade || 1;
+  document.getElementById('editValidade').value = produto.validade || '';
+
+  document.querySelectorAll('#grupoCatsEdicao .cat-btn').forEach(b => {
+    b.classList.toggle('sel', b.dataset.cat === produto.categoria);
+  });
+
+  document.getElementById('modalEdicaoBg').classList.add('aberto');
+}
+
+function fecharEdicao() {
+  document.getElementById('modalEdicaoBg').classList.remove('aberto');
+  produtoEditandoId = null;
+  categoriaEdicao = null;
+}
+
+function selCatEdicao(btn) {
+  document.querySelectorAll('#grupoCatsEdicao .cat-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  categoriaEdicao = btn.dataset.cat;
+}
+
+async function salvarEdicao() {
+  const nome = document.getElementById('editProduto').value.trim();
+  const marca = document.getElementById('editMarca').value.trim();
+  const gramatura = document.getElementById('editGramatura').value.trim();
+  const quantidade = parseInt(document.getElementById('editQuantidade').value) || 1;
+  const validade = document.getElementById('editValidade').value;
+
+  if (!nome || !validade || !categoriaEdicao) {
+    mostrarToast('Preencha nome, categoria e validade', '#E53935');
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('produtos')
+    .update({
+      nome,
+      marca,
+      gramatura,
+      quantidade,
+      categoria: categoriaEdicao,
+      validade
+    })
+    .eq('id', produtoEditandoId);
+
+  if (error) {
+    console.error('Erro ao editar:', error);
+    mostrarToast('Erro ao salvar alterações', '#E53935');
+    return;
+  }
+
+  fecharEdicao();
+  mostrarToast('✓ Produto atualizado!');
+  await carregarProdutos();
+}
+
 // ========== UI DO MODAL ==========
 function montarCategorias() {
   const grupo = document.getElementById('grupoCats');
   grupo.innerHTML = CATEGORIAS.map(c =>
     `<button type="button" class="cat-btn" data-cat="${c.nome}" onclick="selCat(this)">${c.nome}</button>`
+  ).join('');
+
+  const grupoEdicao = document.getElementById('grupoCatsEdicao');
+  grupoEdicao.innerHTML = CATEGORIAS.map(c =>
+    `<button type="button" class="cat-btn" data-cat="${c.nome}" onclick="selCatEdicao(this)">${c.nome}</button>`
   ).join('');
 }
 
@@ -698,7 +765,7 @@ function abrirModal() {
   document.getElementById('inGramatura').value = '';
   document.getElementById('inQuantidade').value = '1';
   document.getElementById('inValidade').value = '';
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('#grupoCats .cat-btn').forEach(b => b.classList.remove('sel'));
   categoriaSelecionada = null;
 }
 
@@ -707,7 +774,7 @@ function fecharModal() {
 }
 
 function selCat(btn) {
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('#grupoCats .cat-btn').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
   categoriaSelecionada = btn.dataset.cat;
 }
@@ -779,12 +846,10 @@ function renderizar() {
     return;
   }
 
-  // Ordena globalmente pela data de validade mais próxima
   const ordenados = [...filtrados].sort(
     (a, b) => diasRestantes(a.validade) - diasRestantes(b.validade)
   );
 
-  // Lista única, sem agrupamento por categoria
   lista.innerHTML = ordenados.map(p => renderProduto(p)).join('');
 }
 
@@ -793,22 +858,16 @@ function renderProduto(p) {
   const cls = classeDias(dias);
   const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
   const qtd = p.quantidade || 1;
-  const marcaGram = [p.marca, p.gramatura].filter(Boolean).join(' • ');
+  const unidadeTexto = `${qtd} ${qtd === 1 ? 'unidade' : 'unidades'}`;
+
   return `<div class="produto ${cls}">
-    <div class="icone-produto">📦</div>
-    <div class="info">
-      <div class="nome">${p.nome}</div>
-      ${marcaGram ? `<div class="marca-gram">${marcaGram}</div>` : ''}
-      <div class="marca-gram" style="color:var(--azul);font-weight:600">${p.categoria}</div>
-      <div class="dias ${cls}">${textoDias(dias)}</div>
-      <div class="data">Validade: ${dataFmt}</div>
-      <div class="qtd-control">
-        <button onclick="alterarQtd('${p.id}', -1)">−</button>
-        <span class="qtd-val">${qtd}</span>
-        <button onclick="alterarQtd('${p.id}', +1)">+</button>
-      </div>
-    </div>
-    <button class="del" onclick="excluir('${p.id}')">✕</button>
+    <button class="btn-excluir" onclick="excluir('${p.id}')" title="Excluir">✕</button>
+    <span class="cat-badge">${p.categoria}</span>
+    <div class="nome">${p.nome}</div>
+    <div class="unidades">${unidadeTexto}</div>
+    <div class="dias ${cls}">${textoDias(dias)}</div>
+    <div class="data">Validade: ${dataFmt}</div>
+    <button class="btn-editar" onclick="abrirEdicao('${p.id}')" title="Editar">✏️</button>
   </div>`;
 }
 
