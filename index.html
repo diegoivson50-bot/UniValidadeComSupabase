@@ -366,9 +366,6 @@
     <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--cinza);">
       <a href="#" id="linkAlternar" onclick="alternarModo()" style="color: var(--azul); font-weight: 600;">Criar conta</a>
     </p>
-    <p style="text-align: center; margin-top: 8px; font-size: 14px;">
-      <a href="#" onclick="pedirReset()" style="color: var(--cinza);">Esqueci minha senha</a>
-    </p>
   </div>
 </div>
 
@@ -533,24 +530,6 @@
   </div>
 </div>
 
-<!-- ========== MODAL RESET DE SENHA (link de e-mail) ========== -->
-<div class="modal-bg" id="modalResetBg">
-  <div class="modal">
-    <h3>Definir Nova Senha <button class="fechar" onclick="fecharReset()">✕</button></h3>
-
-    <div class="campo">
-      <label>Nova Senha</label>
-      <input id="inNovaSenha" type="password" placeholder="Mínimo 6 caracteres">
-    </div>
-    <div class="campo">
-      <label>Confirmar Nova Senha</label>
-      <input id="inNovaSenha2" type="password" placeholder="Repita a nova senha">
-    </div>
-
-    <button class="btn" onclick="confirmarNovaSenha()">💾 Salvar Nova Senha</button>
-  </div>
-</div>
-
 <div class="toast" id="toast">✓ Produto salvo!</div>
 
 <script>
@@ -573,8 +552,6 @@ const CATEGORIAS = [
   { nome: 'Complemento Alimentar', slug: 'complemento' },
   { nome: 'Food Solution', slug: 'food' }
 ];
-
-const REDIRECT_RESET = 'https://diegoivson50-bot.github.io/UniValidadeComSupabase/?reset=true';
 
 let promotor = null;
 let emailUsuario = null;
@@ -676,58 +653,6 @@ async function iniciarDashboard(user) {
 }
 
 async function sair() {
-  await supabaseClient.auth.signOut();
-  location.reload();
-}
-
-// ========== RESET DE SENHA (via e-mail) ==========
-async function pedirReset() {
-  const email = document.getElementById('inEmail').value.trim();
-  if (!email) {
-    mostrarToast('Digite seu e-mail no campo acima primeiro.', '#FFB300');
-    return;
-  }
-
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: REDIRECT_RESET
-  });
-
-  if (error) {
-    mostrarToast('Erro: ' + error.message, '#E53935');
-    return;
-  }
-  mostrarToast('Link enviado! Verifique seu e-mail.', '#43A047');
-}
-
-function fecharReset() {
-  document.getElementById('modalResetBg').classList.remove('aberto');
-  window.history.replaceState({}, document.title, window.location.pathname);
-  location.reload();
-}
-
-async function confirmarNovaSenha() {
-  const novaSenha = document.getElementById('inNovaSenha').value;
-  const confirmacao = document.getElementById('inNovaSenha2').value;
-
-  if (!novaSenha || novaSenha.length < 6) {
-    mostrarToast('A senha deve ter pelo menos 6 caracteres.', '#E53935');
-    return;
-  }
-  if (novaSenha !== confirmacao) {
-    mostrarToast('As senhas não coincidem.', '#E53935');
-    return;
-  }
-
-  const { error } = await supabaseClient.auth.updateUser({ password: novaSenha });
-
-  if (error) {
-    mostrarToast('Erro: ' + error.message, '#E53935');
-    return;
-  }
-
-  mostrarToast('Senha atualizada! Faça login.', '#43A047');
-  document.getElementById('modalResetBg').classList.remove('aberto');
-  window.history.replaceState({}, document.title, window.location.pathname);
   await supabaseClient.auth.signOut();
   location.reload();
 }
@@ -1116,12 +1041,6 @@ window.onload = async () => {
   montarCategorias();
 
   try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('reset') === 'true') {
-      document.getElementById('modalResetBg').classList.add('aberto');
-      return;
-    }
-
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
       await iniciarDashboard(session.user);
