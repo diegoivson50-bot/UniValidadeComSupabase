@@ -93,6 +93,31 @@
     cursor: not-allowed;
   }
 
+  /* ---- Campo EAN + botão escanear ---- */
+  .campo-ean {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .campo-ean input { flex: 1; }
+  .btn-escanear {
+    padding: 0 18px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    transition: .2s;
+    box-shadow: 0 4px 12px rgba(31,54,199,.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+  }
+  .btn-escanear:active { transform: scale(.95); }
+  .btn-escanear:disabled { opacity: .6; cursor: not-allowed; }
+
   .btn {
     width: 100%; padding: 16px; border: none; border-radius: 14px;
     background: linear-gradient(135deg, var(--azul), var(--azul-claro));
@@ -308,8 +333,10 @@
   .toast {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
     background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px;
-    font-size: 14px; font-weight: 600; z-index: 200; transition: .3s;
+    font-size: 14px; font-weight: 600; z-index: 300; transition: .3s;
     box-shadow: 0 8px 20px rgba(67,160,71,.3);
+    max-width: 90vw;
+    text-align: center;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -320,8 +347,44 @@
     padding-bottom: 6px;
     border-bottom: 2px solid #E4E8F5;
   }
+
+  /* ---- Modal do scanner de código de barras ---- */
+  #scannerModalBg { z-index: 200; }
+  #scannerModalBg .modal {
+    max-height: 95vh;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+    text-align: center;
+  }
+  #scannerModalBg h3 { justify-content: space-between; margin-bottom: 12px; }
+  #scanner-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    border: 2px solid #E4E8F5;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 4 / 3;
+    position: relative;
+  }
+  #scanner-container video,
+  #scanner-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+  #scanner-status {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--cinza);
+    font-weight: 600;
+    min-height: 20px;
+  }
+  #scanner-status.erro { color: var(--vermelho); }
+  #scanner-status.sucesso { color: var(--verde); }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 </head>
 <body>
 
@@ -458,6 +521,14 @@
     <h3>Novo Produto <button class="fechar" onclick="fecharModal()">✕</button></h3>
 
     <div class="campo">
+      <label>Código de Barras (EAN)</label>
+      <div class="campo-ean">
+        <input id="inEAN" placeholder="Digite ou escaneie o código" inputmode="numeric">
+        <button class="btn-escanear" onclick="abrirScanner()" title="Escanear com a câmera">📷</button>
+      </div>
+    </div>
+
+    <div class="campo">
       <label>Nome do Produto</label>
       <input id="inProduto" placeholder="Ex: Maionese Hellmann's">
     </div>
@@ -488,6 +559,15 @@
     </div>
 
     <button class="btn" onclick="salvarProduto()">💾 Salvar Produto</button>
+  </div>
+</div>
+
+<!-- ========== MODAL SCANNER ========== -->
+<div class="modal-bg" id="scannerModalBg">
+  <div class="modal">
+    <h3>📷 Escanear Código <button class="fechar" onclick="fecharScanner()">✕</button></h3>
+    <div id="scanner-container"></div>
+    <div id="scanner-status">Aponte a câmera para o código de barras...</div>
   </div>
 </div>
 
@@ -539,6 +619,99 @@ const supabaseClient = createClient(
   'https://ztdsbnpcyjcwcolhzlgv.supabase.co',
   'sb_publishable_Ef3dvtXXkDdN_Pm3lZjTfw_IAkLzr35'
 );
+
+// ========== CONFIGURAÇÃO DA PLANILHA (GOOGLE SHEETS CSV) ==========
+// Estrutura esperada: ,EAN,PLU,DESCRIÇÃO,GRAMATURA,MARCA
+const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6n9cNCwf0qAqFkyGNWRMF86C6nzUKLayvwRyd8Oo6E2sd9jkgA7THIOkwmvSNLGKry4zpg8P5z59O/pub?gid=1564410980&single=true&output=csv';
+
+let baseProdutos = {};   // { EAN: {plu, descricao, gramatura, marca} }
+
+// ========== CARREGAMENTO DA BASE ==========
+async function carregarBaseProdutos() {
+  try {
+    const resp = await fetch(URL_CSV, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const csv = await resp.text();
+    baseProdutos = csvParaBase(csv);
+    console.log('✅ Base de produtos carregada:', Object.keys(baseProdutos).length, 'itens');
+  } catch (err) {
+    console.error('❌ Erro ao carregar base de produtos:', err);
+  }
+}
+
+function csvParaBase(csv) {
+  const linhas = parseCSV(csv);
+  const base = {};
+  for (let i = 0; i < linhas.length; i++) {
+    const l = linhas[i];
+    if (!l || l.length < 4) continue;
+
+    const ean       = (l[1] || '').trim();
+    const plu       = (l[2] || '').trim();
+    const descricao = (l[3] || '').trim();
+    const gramatura = (l[4] || '').trim();
+    const marca     = (l[5] || '').trim();
+
+    if (!/^\d{8,14}$/.test(ean)) continue;
+    if (descricao.toUpperCase() === 'DESCRIÇÃO DE PRODUTO') continue;
+    if (base[ean]) continue;
+
+    base[ean] = {
+      plu: plu || null,
+      descricao: descricao || '(sem descrição)',
+      gramatura: gramatura || null,
+      marca: marca || null
+    };
+  }
+  return base;
+}
+
+function parseCSV(texto) {
+  const linhas = [];
+  let campo = '', linha = [], dentroAspas = false;
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (dentroAspas) {
+      if (c === '"' && texto[i + 1] === '"') { campo += '"'; i++; }
+      else if (c === '"') { dentroAspas = false; }
+      else { campo += c; }
+    } else {
+      if (c === '"') dentroAspas = true;
+      else if (c === ',') { linha.push(campo); campo = ''; }
+      else if (c === '\n') { linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
+      else if (c === '\r') { }
+      else { campo += c; }
+    }
+  }
+  if (campo !== '' || linha.length) { linha.push(campo); linhas.push(linha); }
+  return linhas;
+}
+
+// ========== BUSCA POR EAN ==========
+function buscarPorEAN(ean) {
+  const codigo = (ean || '').trim();
+  if (!codigo) return null;
+  return baseProdutos[codigo] || null;
+}
+
+// Aplica o preenchimento automático no modal de cadastro
+function aplicarEANNoFormulario(ean) {
+  const prod = buscarPorEAN(ean);
+
+  document.getElementById('inEAN').value = ean;
+
+  if (!prod) {
+    mostrarToast('❌ Produto não encontrado na planilha', '#E53935');
+    return false;
+  }
+
+  document.getElementById('inProduto').value   = prod.descricao || '';
+  document.getElementById('inMarca').value     = prod.marca || '';
+  document.getElementById('inGramatura').value = prod.gramatura || '';
+
+  mostrarToast('✓ Produto encontrado: ' + prod.descricao);
+  return true;
+}
 
 // ========== ESTADO GLOBAL ==========
 const CATEGORIAS = [
@@ -657,7 +830,7 @@ async function sair() {
   location.reload();
 }
 
-// ========== ALTERAR SENHA (aba Perfil, usuário logado) ==========
+// ========== ALTERAR SENHA (aba Perfil) ==========
 async function alterarSenhaPerfil() {
   const novaSenha = document.getElementById('perfilNovaSenha').value;
   const confirmacao = document.getElementById('perfilNovaSenha2').value;
@@ -916,6 +1089,7 @@ function montarCategorias() {
 
 function abrirModal() {
   document.getElementById('modalBg').classList.add('aberto');
+  document.getElementById('inEAN').value = '';
   document.getElementById('inProduto').value = '';
   document.getElementById('inMarca').value = '';
   document.getElementById('inGramatura').value = '';
@@ -933,6 +1107,186 @@ function selCat(btn) {
   document.querySelectorAll('#grupoCats .cat-btn').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
   categoriaSelecionada = btn.dataset.cat;
+}
+
+// ========== LEITOR DE CÓDIGO DE BARRAS (CÂMERA) ==========
+const scannerModalBg = document.getElementById('scannerModalBg');
+const scannerContainer = document.getElementById('scanner-container');
+const scannerStatus = document.getElementById('scanner-status');
+
+let scannerAtivo = false;
+let scannerUsandoNativo = false;
+let barcodeDetector = null;
+let scannerInterval = null;
+
+async function verificarSuporteNativo() {
+  if (!('BarcodeDetector' in window)) return false;
+  try {
+    const formatos = await BarcodeDetector.getSupportedFormats();
+    const desejados = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+    return formatos.some(f => desejados.includes(f));
+  } catch { return false; }
+}
+
+async function abrirScanner() {
+  scannerContainer.innerHTML = '';
+  scannerStatus.textContent = 'Iniciando câmera...';
+  scannerStatus.className = '';
+  scannerModalBg.classList.add('aberto');
+
+  const suporteNativo = await verificarSuporteNativo();
+  if (suporteNativo) {
+    await iniciarScannerNativo();
+  } else {
+    iniciarScannerQuagga();
+  }
+}
+
+async function iniciarScannerNativo() {
+  scannerUsandoNativo = true;
+  try {
+    const video = document.createElement('video');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('playsinline', '');
+    video.muted = true;
+    scannerContainer.appendChild(video);
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    video.srcObject = stream;
+
+    await new Promise(resolve => {
+      video.onloadedmetadata = () => { video.play(); resolve(); };
+    });
+
+    const suportados = await BarcodeDetector.getSupportedFormats();
+    const desejados = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39'];
+    const filtrados = desejados.filter(f => suportados.includes(f));
+    if (filtrados.length === 0) throw new Error('Nenhum formato suportado.');
+
+    barcodeDetector = new BarcodeDetector({ formats: filtrados });
+    scannerAtivo = true;
+    scannerStatus.textContent = 'Aponte a câmera para o código...';
+
+    scannerInterval = setInterval(async () => {
+      if (!scannerAtivo || !barcodeDetector) return;
+      try {
+        const barcodes = await barcodeDetector.detect(video);
+        if (barcodes.length > 0) {
+          const codigo = barcodes[0].rawValue;
+          if (codigo && codigo.length >= 6) aoDetectarEAN(codigo);
+        }
+      } catch (e) { /* frame ruim */ }
+    }, 150);
+
+  } catch (err) {
+    console.error('Erro no scanner nativo:', err);
+    scannerStatus.textContent = '❌ Erro ao acessar a câmera. Use HTTPS e permita o acesso.';
+    scannerStatus.className = 'erro';
+    scannerAtivo = false;
+  }
+}
+
+function iniciarScannerQuagga() {
+  scannerUsandoNativo = false;
+  Quagga.init({
+    inputStream: {
+      name: 'Live', type: 'LiveStream', target: scannerContainer,
+      constraints: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    },
+    locator: { patchSize: 'medium', halfSample: true },
+    numOfWorkers: navigator.hardwareConcurrency || 2,
+    frequency: 10,
+    decoder: {
+      readers: ['ean_reader', 'ean_8_reader', 'upc_reader', 'upc_e_reader', 'code_128_reader', 'code_39_reader']
+    },
+    locate: true
+  }, function (err) {
+    if (err) {
+      console.error('Erro Quagga:', err);
+      scannerStatus.textContent = '❌ Erro ao acessar a câmera. Use HTTPS e permita o acesso.';
+      scannerStatus.className = 'erro';
+      return;
+    }
+    Quagga.start();
+    scannerAtivo = true;
+    scannerStatus.textContent = 'Aponte a câmera para o código...';
+  });
+
+  if (typeof Quagga !== 'undefined') {
+    Quagga.onDetected(function (resultado) {
+      if (scannerAtivo && !scannerUsandoNativo) {
+        const codigo = resultado.codeResult.code;
+        if (codigo && codigo.length >= 6) aoDetectarEAN(codigo);
+      }
+    });
+  }
+}
+
+function aoDetectarEAN(codigo) {
+  if (!scannerAtivo) return;
+  scannerAtivo = false;
+
+  const encontrado = aplicarEANNoFormulario(codigo);
+
+  scannerStatus.textContent = encontrado
+    ? '✅ Código: ' + codigo
+    : '❌ EAN ' + codigo + ' não encontrado na planilha';
+  scannerStatus.className = encontrado ? 'sucesso' : 'erro';
+
+  if (navigator.vibrate) navigator.vibrate(200);
+
+  setTimeout(() => fecharScanner(), 1200);
+}
+
+function fecharScanner() {
+  scannerAtivo = false;
+  scannerModalBg.classList.remove('aberto');
+
+  if (scannerInterval) {
+    clearInterval(scannerInterval);
+    scannerInterval = null;
+  }
+  if (!scannerUsandoNativo && typeof Quagga !== 'undefined') {
+    try { Quagga.stop(); } catch (e) { }
+  }
+  if (scannerUsandoNativo) {
+    const video = scannerContainer.querySelector('video');
+    if (video && video.srcObject) {
+      video.srcObject.getTracks().forEach(t => t.stop());
+      video.srcObject = null;
+    }
+  }
+  scannerContainer.innerHTML = '';
+}
+
+// ========== BUSCA MANUAL DO EAN (DIGITAÇÃO) ==========
+function configurarBuscaManualEAN() {
+  const inEAN = document.getElementById('inEAN');
+  if (!inEAN) return;
+
+  // Enter → busca
+  inEAN.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const codigo = inEAN.value.trim();
+      if (codigo.length >= 8 && /^\d+$/.test(codigo)) {
+        aplicarEANNoFormulario(codigo);
+      }
+    }
+  });
+
+  // Ao sair do campo (blur) → busca se tiver EAN válido e o nome ainda estiver vazio
+  inEAN.addEventListener('blur', () => {
+    const codigo = inEAN.value.trim();
+    if (codigo.length >= 8 && /^\d+$/.test(codigo)) {
+      const nomeAtual = document.getElementById('inProduto').value.trim();
+      if (!nomeAtual) {
+        aplicarEANNoFormulario(codigo);
+      }
+    }
+  });
 }
 
 // ========== FILTROS E RENDERIZAÇÃO ==========
@@ -1033,12 +1387,16 @@ function mostrarToast(msg, cor = '#43A047') {
   t.textContent = msg;
   t.style.background = cor;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 // ========== INICIALIZAÇÃO ==========
 window.onload = async () => {
   montarCategorias();
+  configurarBuscaManualEAN();   // <-- configura Enter + blur no campo EAN
+
+  carregarBaseProdutos();
 
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
