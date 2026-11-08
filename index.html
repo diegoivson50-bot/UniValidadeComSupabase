@@ -695,13 +695,18 @@ function buscarPorEAN(ean) {
 }
 
 // Aplica o preenchimento automático no modal de cadastro
-function aplicarEANNoFormulario(ean) {
+// origem: 'camera' ou 'manual'
+function aplicarEANNoFormulario(ean, origem = 'manual') {
   const prod = buscarPorEAN(ean);
 
   document.getElementById('inEAN').value = ean;
 
   if (!prod) {
-    mostrarToast('❌ Produto não encontrado na planilha', '#E53935');
+    if (origem === 'camera') {
+      mostrarToast('Código não encontrado. Digite manualmente.', '#E53935');
+    } else {
+      mostrarToast('❌ Produto não encontrado na planilha', '#E53935');
+    }
     return false;
   }
 
@@ -711,6 +716,11 @@ function aplicarEANNoFormulario(ean) {
 
   mostrarToast('✓ Produto encontrado: ' + prod.descricao);
   return true;
+}
+
+// Versão específica para leitura por câmera
+function aplicarEANDaCamera(ean) {
+  return aplicarEANNoFormulario(ean, 'camera');
 }
 
 // ========== ESTADO GLOBAL ==========
@@ -1228,16 +1238,16 @@ function aoDetectarEAN(codigo) {
   if (!scannerAtivo) return;
   scannerAtivo = false;
 
-  const encontrado = aplicarEANNoFormulario(codigo);
+  const encontrado = aplicarEANDaCamera(codigo);   // <-- usa a versão da câmera
 
   scannerStatus.textContent = encontrado
     ? '✅ Código: ' + codigo
-    : '❌ EAN ' + codigo + ' não encontrado na planilha';
+    : 'Código não encontrado. Digite manualmente.';
   scannerStatus.className = encontrado ? 'sucesso' : 'erro';
 
   if (navigator.vibrate) navigator.vibrate(200);
 
-  setTimeout(() => fecharScanner(), 1200);
+  setTimeout(() => fecharScanner(), 1500);
 }
 
 function fecharScanner() {
@@ -1272,7 +1282,7 @@ function configurarBuscaManualEAN() {
       e.preventDefault();
       const codigo = inEAN.value.trim();
       if (codigo.length >= 8 && /^\d+$/.test(codigo)) {
-        aplicarEANNoFormulario(codigo);
+        aplicarEANNoFormulario(codigo);   // origem 'manual' (padrão)
       }
     }
   });
@@ -1283,7 +1293,7 @@ function configurarBuscaManualEAN() {
     if (codigo.length >= 8 && /^\d+$/.test(codigo)) {
       const nomeAtual = document.getElementById('inProduto').value.trim();
       if (!nomeAtual) {
-        aplicarEANNoFormulario(codigo);
+        aplicarEANNoFormulario(codigo);   // origem 'manual' (padrão)
       }
     }
   });
@@ -1394,7 +1404,7 @@ function mostrarToast(msg, cor = '#43A047') {
 // ========== INICIALIZAÇÃO ==========
 window.onload = async () => {
   montarCategorias();
-  configurarBuscaManualEAN();   // <-- configura Enter + blur no campo EAN
+  configurarBuscaManualEAN();   // configura Enter + blur no campo EAN
 
   carregarBaseProdutos();
 
