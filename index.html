@@ -131,6 +131,12 @@
     box-shadow: none;
     margin-top: 10px;
   }
+  .btn.perigo {
+    background: #FFEBEE;
+    color: var(--vermelho);
+    box-shadow: none;
+    margin-top: 10px;
+  }
 
   .header { margin-bottom: 20px; }
   .header h2 { font-size: 22px; }
@@ -231,6 +237,32 @@
     cursor: pointer;
   }
 
+  /* ---- Barra de título dos produtos + botão excluir todos ---- */
+  .barra-produtos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .barra-produtos h2 { font-size: 17px; }
+  .btn-excluir-todos {
+    background: #FFEBEE;
+    border: none;
+    color: var(--vermelho);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: .2s;
+  }
+  .btn-excluir-todos:active { transform: scale(.95); }
+
+  /* ---- Card do produto ---- */
   .produto {
     background: var(--card); border-radius: 18px; padding: 14px 44px 44px 18px;
     margin-bottom: 12px; box-shadow: var(--sombra);
@@ -254,12 +286,38 @@
   }
   .produto .nome { font-weight: 600; font-size: 15px; margin-bottom: 4px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .produto .unidades { font-size: 12px; color: var(--cinza); margin-bottom: 6px; }
-  .produto .dias { font-size: 12px; font-weight: 600; }
+
+  /* ---- Destaques: unidades e validade ---- */
+  .produto .info-destaque {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 6px;
+  }
+  .produto .info-destaque .info-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .produto .info-item.unidades {
+    background: #E8F5E9;
+    color: #2E7D32;
+  }
+  .produto .info-item.validade {
+    background: #EEF1FF;
+    color: var(--azul);
+  }
+  .produto .info-item.validade.alerta { background: #FFF8E1; color: #B26A00; }
+  .produto .info-item.validade.vencido { background: #FFEBEE; color: var(--vermelho); }
+
+  .produto .dias { font-size: 12px; font-weight: 600; margin-top: 4px; }
   .produto .dias.ok { color: var(--verde); }
   .produto .dias.alerta { color: var(--amarelo); }
   .produto .dias.vencido { color: var(--vermelho); }
-  .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
 
   .btn-excluir {
     position: absolute; top: 10px; right: 10px;
@@ -347,6 +405,7 @@
     padding-bottom: 6px;
     border-bottom: 2px solid #E4E8F5;
   }
+  .secao-titulo.perigo { color: var(--vermelho); border-bottom-color: #FFCDD2; }
 
   /* ---- Modal do scanner de código de barras ---- */
   #scannerModalBg { z-index: 200; }
@@ -449,8 +508,11 @@
     <button onclick="limparFiltro()">✕ Limpar</button>
   </div>
 
-  <div class="header" style="margin-bottom:12px">
-    <h2 style="font-size:17px">Produtos cadastrados</h2>
+  <div class="barra-produtos">
+    <h2>Produtos cadastrados</h2>
+    <button class="btn-excluir-todos" onclick="excluirTodosProdutos()" title="Excluir todos os produtos">
+      🗑️ Excluir todos
+    </button>
   </div>
   <div id="listaProdutos"></div>
 </div>
@@ -497,6 +559,13 @@
   </div>
 
   <button class="btn secundario" onclick="alterarSenhaPerfil()">🔑 Alterar Senha</button>
+
+  <h3 class="secao-titulo perigo">⚠️ Zona de Perigo</h3>
+
+  <button class="btn perigo" onclick="excluirConta()">🗑️ Excluir minha conta</button>
+  <p style="font-size:12px;color:var(--cinza);margin-top:8px;text-align:center">
+    Esta ação é irreversível. Todos os seus produtos e dados serão apagados.
+  </p>
 </div>
 
 <!-- ========== BOTÃO FLUTUANTE ========== -->
@@ -1016,6 +1085,104 @@ async function excluir(id) {
   mostrarToast('Produto removido');
 }
 
+// ========== EXCLUIR TODOS OS PRODUTOS ==========
+async function excluirTodosProdutos() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    mostrarToast('Sessão expirada. Faça login.', '#E53935');
+    return;
+  }
+
+  if (produtos.length === 0) {
+    mostrarToast('Nenhum produto para excluir.', '#FFB300');
+    return;
+  }
+
+  // Primeira confirmação
+  if (!confirm(`Tem certeza que deseja excluir TODOS os ${produtos.length} produtos?\n\nEsta ação não pode ser desfeita.`)) {
+    return;
+  }
+
+  // Segunda confirmação (proteção extra)
+  if (!confirm('⚠️ CONFIRMAÇÃO FINAL: apagar TODOS os produtos definitivamente?')) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('produtos')
+    .delete()
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('Erro ao excluir todos:', error);
+    mostrarToast('Erro ao excluir produtos', '#E53935');
+    return;
+  }
+
+  await carregarProdutos();
+  mostrarToast('✓ Todos os produtos foram excluídos');
+}
+
+// ========== EXCLUIR CONTA ==========
+async function excluirConta() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    mostrarToast('Sessão expirada. Faça login.', '#E53935');
+    return;
+  }
+
+  // Primeira confirmação
+  if (!confirm('⚠️ Tem certeza que deseja EXCLUIR SUA CONTA?\n\nTodos os seus produtos serão apagados permanentemente.')) {
+    return;
+  }
+
+  // Segunda confirmação
+  const digitado = prompt('Para confirmar, digite a palavra: EXCLUIR');
+  if (digitado !== 'EXCLUIR') {
+    mostrarToast('Exclusão cancelada.', '#FFB300');
+    return;
+  }
+
+  mostrarToast('Excluindo conta...', '#FFB300');
+
+  try {
+    // 1) Apaga todos os produtos do usuário
+    const { error: erroProdutos } = await supabaseClient
+      .from('produtos')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (erroProdutos) {
+      console.error('Erro ao apagar produtos:', erroProdutos);
+      // Continua mesmo assim, para tentar apagar a conta
+    }
+
+    // 2) Apaga a conta do usuário autenticado
+    //    (Supabase permite o usuário deletar a própria conta via RPC ou Edge Function.
+    //     Usamos o endpoint de "delete user" via função RPC "delete_my_account"
+    //     caso exista no projeto; senão, tentamos via auth.admin em backend.
+    //     Para simplicidade no frontend, chamamos a RPC abaixo.)
+    const { error: erroConta } = await supabaseClient.rpc('delete_my_account');
+
+    if (erroConta) {
+      console.error('Erro ao apagar conta via RPC:', erroConta);
+      // Fallback: apenas faz logout e avisa
+      mostrarToast('Conta não pôde ser apagada automaticamente. Contate o suporte.', '#E53935');
+      await supabaseClient.auth.signOut();
+      setTimeout(() => location.reload(), 2000);
+      return;
+    }
+
+    mostrarToast('✓ Conta excluída com sucesso!', '#43A047');
+    await supabaseClient.auth.signOut();
+    setTimeout(() => location.reload(), 1500);
+
+  } catch (err) {
+    console.error('Erro inesperado ao excluir conta:', err);
+    mostrarToast('Erro ao excluir conta. Contate o suporte.', '#E53935');
+  }
+}
+
 // ========== EDIÇÃO ==========
 function abrirEdicao(id) {
   const produto = produtos.find(p => String(p.id) === String(id));
@@ -1384,9 +1551,14 @@ function renderProduto(p) {
     <button class="btn-excluir" onclick="excluir('${p.id}')" title="Excluir">✕</button>
     <span class="cat-badge">${p.categoria}</span>
     <div class="nome">${p.nome}</div>
-    <div class="unidades">${unidadeTexto}</div>
+
+    <div class="info-destaque">
+      <span class="info-item unidades">📦 ${unidadeTexto}</span>
+      <span class="info-item validade ${cls}">📅 ${dataFmt}</span>
+    </div>
+
     <div class="dias ${cls}">${textoDias(dias)}</div>
-    <div class="data">Validade: ${dataFmt}</div>
+
     <button class="btn-editar" onclick="abrirEdicao('${p.id}')" title="Editar">✏️</button>
   </div>`;
 }
