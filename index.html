@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UniValidade</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- ===== OneSignal SDK ===== -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "263c1811-e96c-41ac-b262-4c0cbbae3ec6",
+      safari_web_id: "web.onesignal.auto.0d123f70-12e5-49b1-a758-f1abcc853120",
+      // ⚠️ Se seu site estiver em SUBPASTA (usuario.github.io/repositorio/), descomente as linhas abaixo:
+      // serviceWorkerPath: "repositorio/OneSignalSDKWorker.js",
+      // serviceWorkerParam: { scope: "/repositorio/" },
+      notifyButton: {
+        enable: false, // Desativado para não conflitar com o sino personalizado
+      },
+    });
+  });
+</script>
+
 <style>
   :root {
     --azul: #1F36C7;
@@ -93,7 +112,6 @@
     cursor: not-allowed;
   }
 
-  /* ---- Campo EAN + botão escanear ---- */
   .campo-ean {
     display: flex;
     gap: 8px;
@@ -135,6 +153,56 @@
   .header { margin-bottom: 20px; }
   .header h2 { font-size: 22px; }
   .header .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
+
+  .alerta-vencimento {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+    border: 2px solid #FFB300;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(255,179,0,.15);
+    animation: fade .3s ease;
+  }
+  .alerta-vencimento.visivel { display: flex; }
+  .alerta-vencimento.critico {
+    background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+    border-color: var(--vermelho);
+    box-shadow: 0 4px 12px rgba(229,57,53,.15);
+  }
+  .alerta-vencimento .alerta-icone { font-size: 28px; flex-shrink: 0; }
+  .alerta-vencimento .alerta-texto {
+    flex: 1; font-size: 13px; font-weight: 600; color: #7A4F00; line-height: 1.4;
+  }
+  .alerta-vencimento.critico .alerta-texto { color: #B71C1C; }
+  .alerta-vencimento .alerta-texto strong { font-size: 15px; display: block; margin-bottom: 2px; }
+
+  .btn-notificacao {
+    position: relative;
+    background: var(--card);
+    border: 2px solid #E4E8F5;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-notificacao:active { transform: scale(.95); }
+  .btn-notificacao.ativo { border-color: var(--azul); background: #EEF1FF; }
+  .btn-notificacao .badge-notif {
+    position: absolute; top: -6px; right: -6px;
+    background: var(--vermelho); color: white;
+    font-size: 10px; font-weight: 700;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    display: none; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+  .btn-notificacao .badge-notif.visivel { display: flex; }
 
   .resumo {
     display: grid;
@@ -231,7 +299,6 @@
     cursor: pointer;
   }
 
-  /* ---- Barra de título dos produtos + botão excluir todos ---- */
   .barra-produtos {
     display: flex;
     align-items: center;
@@ -256,7 +323,6 @@
   }
   .btn-excluir-todos:active { transform: scale(.95); }
 
-  /* ---- Card do produto ---- */
   .produto {
     background: var(--card); border-radius: 18px; padding: 14px 44px 44px 18px;
     margin-bottom: 12px; box-shadow: var(--sombra);
@@ -279,7 +345,6 @@
     margin-bottom: 6px;
   }
 
-  /* Nome completo, sem cortar com "..." */
   .produto .nome {
     font-weight: 600;
     font-size: 15px;
@@ -291,7 +356,6 @@
     line-height: 1.3;
   }
 
-  /* ---- Destaques: unidades e validade (empilhados) ---- */
   .produto .info-destaque {
     display: flex;
     flex-direction: column;
@@ -308,14 +372,8 @@
     font-size: 13px;
     font-weight: 700;
   }
-  .produto .info-item.unidades {
-    background: #E8F5E9;
-    color: #2E7D32;
-  }
-  .produto .info-item.validade {
-    background: #EEF1FF;
-    color: var(--azul);
-  }
+  .produto .info-item.unidades { background: #E8F5E9; color: #2E7D32; }
+  .produto .info-item.validade { background: #EEF1FF; color: var(--azul); }
   .produto .info-item.validade.alerta { background: #FFF8E1; color: #B26A00; }
   .produto .info-item.validade.vencido { background: #FFEBEE; color: var(--vermelho); }
 
@@ -411,7 +469,6 @@
     border-bottom: 2px solid #E4E8F5;
   }
 
-  /* ---- Modal do scanner de código de barras ---- */
   #scannerModalBg { z-index: 200; }
   #scannerModalBg .modal {
     max-height: 95vh;
@@ -446,8 +503,6 @@
   #scanner-status.erro { color: var(--vermelho); }
   #scanner-status.sucesso { color: var(--verde); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 </head>
 <body>
 
@@ -498,10 +553,26 @@
 <!-- ========== TELA DASHBOARD ========== -->
 <div id="telaDash" class="tela">
   <div class="header-topo">
-    <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
-    <div class="header-texto">
-      <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
-      <p class="sub" id="saudLoja">—</p>
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%; gap:12px;">
+      <div>
+        <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
+        <div class="header-texto">
+          <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
+          <p class="sub" id="saudLoja">—</p>
+        </div>
+      </div>
+      <button class="btn-notificacao" id="btnNotificacao" onclick="toggleNotificacoes()" title="Ativar notificações">
+        🔔
+        <span class="badge-notif" id="badgeNotif">0</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="alerta-vencimento" id="alertaVencimento">
+    <div class="alerta-icone" id="alertaIcone">⚠️</div>
+    <div class="alerta-texto" id="alertaTexto">
+      <strong id="alertaTitulo">Produtos vencendo</strong>
+      <span id="alertaDescricao">—</span>
     </div>
   </div>
 
@@ -678,6 +749,8 @@
 
 <div class="toast" id="toast">✓ Produto salvo!</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 <script>
 // ========== INICIALIZAR SUPABASE ==========
 const { createClient } = supabase;
@@ -686,11 +759,10 @@ const supabaseClient = createClient(
   'sb_publishable_Ef3dvtXXkDdN_Pm3lZjTfw_IAkLzr35'
 );
 
-// ========== CONFIGURAÇÃO DA PLANILHA (GOOGLE SHEETS CSV) ==========
-// Estrutura esperada: ,EAN,PLU,DESCRIÇÃO,GRAMATURA,MARCA
+// ========== CONFIGURAÇÃO DA PLANILHA ==========
 const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6n9cNCwf0qAqFkyGNWRMF86C6nzUKLayvwRyd8Oo6E2sd9jkgA7THIOkwmvSNLGKry4zpg8P5z59O/pub?gid=1564410980&single=true&output=csv';
 
-let baseProdutos = {};   // { EAN: {plu, descricao, gramatura, marca} }
+let baseProdutos = {};
 
 // ========== CARREGAMENTO DA BASE ==========
 async function carregarBaseProdutos() {
@@ -753,18 +825,14 @@ function parseCSV(texto) {
   return linhas;
 }
 
-// ========== BUSCA POR EAN ==========
 function buscarPorEAN(ean) {
   const codigo = (ean || '').trim();
   if (!codigo) return null;
   return baseProdutos[codigo] || null;
 }
 
-// Aplica o preenchimento automático no modal de cadastro
-// origem: 'camera' ou 'manual'
 function aplicarEANNoFormulario(ean, origem = 'manual') {
   const prod = buscarPorEAN(ean);
-
   document.getElementById('inEAN').value = ean;
 
   if (!prod) {
@@ -784,7 +852,6 @@ function aplicarEANNoFormulario(ean, origem = 'manual') {
   return true;
 }
 
-// Versão específica para leitura por câmera
 function aplicarEANDaCamera(ean) {
   return aplicarEANNoFormulario(ean, 'camera');
 }
@@ -810,6 +877,187 @@ let categoriaEdicao = null;
 let filtroCategoria = null;
 let modoCadastro = false;
 let produtoEditandoId = null;
+
+// ========== NOTIFICAÇÕES ==========
+const LIMITE_ALERTA_DIAS = 30;
+const LIMITE_CRITICO_DIAS = 15;
+
+let notificacoesAtivas = false;
+let notificacoesJaEnviadas = {};
+let oneSignalLogado = false;
+
+// Vincula o usuário logado ao OneSignal
+async function vincularOneSignal(userId) {
+  if (oneSignalLogado) return;
+  try {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.login(userId);
+      oneSignalLogado = true;
+      console.log('✅ OneSignal vinculado ao usuário:', userId);
+    });
+  } catch (e) {
+    console.error('Erro ao logar no OneSignal:', e);
+  }
+}
+
+async function toggleNotificacoes() {
+  // Ativa/desativa as notificações locais (banner/badge) e tenta pedir permissão do navegador
+  if (!('Notification' in window)) {
+    mostrarToast('Este navegador não suporta notificações.', '#E53935');
+    return;
+  }
+
+  if (notificacoesAtivas) {
+    notificacoesAtivas = false;
+    localStorage.setItem('univalidade_notif', 'off');
+    document.getElementById('btnNotificacao').classList.remove('ativo');
+    mostrarToast('Notificações desativadas.', '#FFB300');
+    return;
+  }
+
+  if (Notification.permission === 'granted') {
+    notificacoesAtivas = true;
+    localStorage.setItem('univalidade_notif', 'on');
+    document.getElementById('btnNotificacao').classList.add('ativo');
+    mostrarToast('✓ Notificações ativadas!');
+    verificarNotificacoes();
+    return;
+  }
+
+  if (Notification.permission === 'denied') {
+    mostrarToast('Permissão negada. Habilite nas configurações do navegador.', '#E53935');
+    return;
+  }
+
+  const permissao = await Notification.requestPermission();
+  if (permissao === 'granted') {
+    notificacoesAtivas = true;
+    localStorage.setItem('univalidade_notif', 'on');
+    document.getElementById('btnNotificacao').classList.add('ativo');
+    mostrarToast('✓ Notificações ativadas!');
+    verificarNotificacoes();
+
+    // Também tenta registrar no OneSignal (Web Push)
+    try {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.Notifications.requestPermission();
+      });
+    } catch (e) { console.warn(e); }
+  } else {
+    mostrarToast('Permissão de notificação negada.', '#E53935');
+  }
+}
+
+function enviarNotificacao(titulo, corpo) {
+  if (!notificacoesAtivas || Notification.permission !== 'granted') return;
+  try {
+    new Notification(titulo, {
+      body: corpo,
+      icon: './images/logo-univalidade-real.svg',
+      badge: './images/logo-univalidade-real.svg',
+      tag: 'univalidade-alerta',
+      requireInteraction: false
+    });
+  } catch (e) {
+    console.warn('Falha ao enviar notificação:', e);
+  }
+}
+
+function verificarNotificacoes() {
+  if (produtos.length === 0) return;
+
+  const criticos = produtos.filter(p => {
+    const d = diasRestantes(p.validade);
+    return d >= 0 && d <= LIMITE_CRITICO_DIAS;
+  });
+
+  const vencidos = produtos.filter(p => diasRestantes(p.validade) < 0);
+
+  if (notificacoesAtivas) {
+    criticos.forEach(p => {
+      if (notificacoesJaEnviadas[p.id]) return;
+      notificacoesJaEnviadas[p.id] = true;
+      const dias = diasRestantes(p.validade);
+      const texto = dias === 0
+        ? `${p.nome} vence HOJE!`
+        : `${p.nome} vence em ${dias} dia(s).`;
+      enviarNotificacao('⚠️ Produto perto de vencer', texto);
+    });
+
+    const chaveVencidos = 'vencidos_' + new Date().toDateString();
+    if (vencidos.length > 0 && !notificacoesJaEnviadas[chaveVencidos]) {
+      notificacoesJaEnviadas[chaveVencidos] = true;
+      enviarNotificacao(
+        '🚨 Produtos vencidos',
+        `Você tem ${vencidos.length} produto(s) vencido(s). Verifique!`
+      );
+    }
+  }
+}
+
+function atualizarBadgeNotificacao() {
+  const badge = document.getElementById('badgeNotif');
+  const criticos = produtos.filter(p => {
+    const d = diasRestantes(p.validade);
+    return d >= 0 && d <= LIMITE_CRITICO_DIAS;
+  });
+  const vencidos = produtos.filter(p => diasRestantes(p.validade) < 0);
+  const total = criticos.length + vencidos.length;
+
+  if (total > 0) {
+    badge.textContent = total > 99 ? '99+' : total;
+    badge.classList.add('visivel');
+  } else {
+    badge.classList.remove('visivel');
+  }
+}
+
+function atualizarAlertaVencimento() {
+  const alerta = document.getElementById('alertaVencimento');
+  const icone = document.getElementById('alertaIcone');
+  const titulo = document.getElementById('alertaTitulo');
+  const descricao = document.getElementById('alertaDescricao');
+
+  const criticos = produtos.filter(p => {
+    const d = diasRestantes(p.validade);
+    return d >= 0 && d <= LIMITE_CRITICO_DIAS;
+  });
+  const vencidos = produtos.filter(p => diasRestantes(p.validade) < 0);
+  const alertaTotal = produtos.filter(p => {
+    const d = diasRestantes(p.validade);
+    return d > LIMITE_CRITICO_DIAS && d <= LIMITE_ALERTA_DIAS;
+  });
+
+  if (vencidos.length > 0) {
+    alerta.classList.add('visivel', 'critico');
+    icone.textContent = '🚨';
+    titulo.textContent = `${vencidos.length} produto(s) VENCIDO(S)`;
+    descricao.textContent = 'Remova ou atualize os produtos vencidos imediatamente.';
+    return;
+  }
+
+  if (criticos.length > 0) {
+    alerta.classList.add('visivel');
+    alerta.classList.remove('critico');
+    icone.textContent = '⚠️';
+    titulo.textContent = `${criticos.length} produto(s) vencem em até ${LIMITE_CRITICO_DIAS} dias`;
+    descricao.textContent = 'Verifique a lista e tome as providências.';
+    return;
+  }
+
+  if (alertaTotal.length > 0) {
+    alerta.classList.add('visivel');
+    alerta.classList.remove('critico');
+    icone.textContent = '⏰';
+    titulo.textContent = `${alertaTotal.length} produto(s) vencem em até ${LIMITE_ALERTA_DIAS} dias`;
+    descricao.textContent = 'Fique atento à validade.';
+    return;
+  }
+
+  alerta.classList.remove('visivel', 'critico');
+}
 
 // ========== AUTENTICAÇÃO ==========
 function alternarModo() {
@@ -889,6 +1137,9 @@ async function iniciarDashboard(user) {
   };
   emailUsuario = user.email || '';
 
+  // Vincula usuário ao OneSignal
+  await vincularOneSignal(user.id);
+
   document.getElementById('saudNome').textContent = promotor.nome.split(' ')[0];
   document.getElementById('saudLoja').textContent = `${promotor.loja} • ${promotor.cidade}`;
 
@@ -900,14 +1151,21 @@ async function iniciarDashboard(user) {
   setNavAtivo('inicio');
 
   await carregarProdutos();
+  verificarNotificacoes();
 }
 
 async function sair() {
+  try {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.logout();
+    });
+  } catch (e) {}
+  oneSignalLogado = false;
   await supabaseClient.auth.signOut();
   location.reload();
 }
 
-// ========== ALTERAR SENHA (aba Perfil) ==========
 async function alterarSenhaPerfil() {
   const novaSenha = document.getElementById('perfilNovaSenha').value;
   const confirmacao = document.getElementById('perfilNovaSenha2').value;
@@ -933,7 +1191,6 @@ async function alterarSenhaPerfil() {
   mostrarToast('✓ Senha alterada com sucesso!');
 }
 
-// ========== NAVEGAÇÃO ENTRE TELAS ==========
 function setNavAtivo(qual) {
   document.getElementById('navInicio').classList.toggle('ativo', qual === 'inicio');
   document.getElementById('navPerfil').classList.toggle('ativo', qual === 'perfil');
@@ -993,7 +1250,7 @@ async function salvarPerfil() {
   mostrarToast('✓ Perfil atualizado!');
 }
 
-// ========== PRODUTOS (SUPABASE) ==========
+// ========== PRODUTOS ==========
 async function carregarProdutos() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) {
@@ -1015,6 +1272,9 @@ async function carregarProdutos() {
 
   produtos = data || [];
   renderizar();
+  atualizarBadgeNotificacao();
+  atualizarAlertaVencimento();
+  verificarNotificacoes();
 }
 
 async function salvarProduto() {
@@ -1083,7 +1343,6 @@ async function excluir(id) {
   mostrarToast('Produto removido');
 }
 
-// ========== EXCLUIR TODOS OS PRODUTOS ==========
 async function excluirTodosProdutos() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) {
@@ -1187,7 +1446,6 @@ async function salvarEdicao() {
   await carregarProdutos();
 }
 
-// ========== UI DO MODAL ==========
 function montarCategorias() {
   const grupo = document.getElementById('grupoCats');
   grupo.innerHTML = CATEGORIAS.map(c =>
@@ -1222,7 +1480,7 @@ function selCat(btn) {
   categoriaSelecionada = btn.dataset.cat;
 }
 
-// ========== LEITOR DE CÓDIGO DE BARRAS (CÂMERA) ==========
+// ========== LEITOR DE CÓDIGO DE BARRAS ==========
 const scannerModalBg = document.getElementById('scannerModalBg');
 const scannerContainer = document.getElementById('scanner-container');
 const scannerStatus = document.getElementById('scanner-status');
@@ -1290,7 +1548,7 @@ async function iniciarScannerNativo() {
           const codigo = barcodes[0].rawValue;
           if (codigo && codigo.length >= 6) aoDetectarEAN(codigo);
         }
-      } catch (e) { /* frame ruim */ }
+      } catch (e) { }
     }, 150);
 
   } catch (err) {
@@ -1374,7 +1632,6 @@ function fecharScanner() {
   scannerContainer.innerHTML = '';
 }
 
-// ========== BUSCA MANUAL DO EAN (DIGITAÇÃO) ==========
 function configurarBuscaManualEAN() {
   const inEAN = document.getElementById('inEAN');
   if (!inEAN) return;
@@ -1497,7 +1754,6 @@ function renderProduto(p) {
   </div>`;
 }
 
-// ========== TOAST ==========
 function mostrarToast(msg, cor = '#43A047') {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1514,6 +1770,15 @@ window.onload = async () => {
 
   carregarBaseProdutos();
 
+  // Restaura preferência de notificações
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const pref = localStorage.getItem('univalidade_notif');
+    if (pref === 'on') {
+      notificacoesAtivas = true;
+      document.getElementById('btnNotificacao').classList.add('ativo');
+    }
+  }
+
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
@@ -1522,6 +1787,15 @@ window.onload = async () => {
   } catch (e) {
     console.error('Erro ao restaurar sessão:', e);
   }
+
+  // Re-verifica a cada 5 minutos
+  setInterval(() => {
+    if (produtos.length > 0) {
+      atualizarBadgeNotificacao();
+      atualizarAlertaVencimento();
+      verificarNotificacoes();
+    }
+  }, 5 * 60 * 1000);
 };
 </script>
 </body>
