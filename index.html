@@ -14,11 +14,10 @@
     await OneSignal.init({
       appId: "263c1811-e96c-41ac-b262-4c0cbbae3ec6",
       safari_web_id: "web.onesignal.auto.0d123f70-12e5-49b1-a758-f1abcc853120",
-      // ⚠️ Se seu site estiver em SUBPASTA (usuario.github.io/repositorio/), descomente as linhas abaixo:
-      // serviceWorkerPath: "repositorio/OneSignalSDKWorker.js",
-      // serviceWorkerParam: { scope: "/repositorio/" },
+      serviceWorkerPath: "UniValidadeComSupabase/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/UniValidadeComSupabase/" },
       notifyButton: {
-        enable: false, // Desativado para não conflitar com o sino personalizado
+        enable: false,
       },
     });
   });
