@@ -401,6 +401,27 @@
   }
   .btn-editar:active { transform: scale(.9); }
 
+  /* NOVO: Estilo do botão do WhatsApp */
+  .btn-whatsapp {
+    position: absolute;
+    bottom: 10px;
+    right: 54px; /* Posiciona ao lado do botão de editar */
+    background: #E8F5E9;
+    border: none;
+    color: #25D366;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s;
+    box-shadow: 0 2px 6px rgba(37,211,102,.15);
+  }
+  .btn-whatsapp:active { transform: scale(.9); }
+
   .vazio { text-align: center; padding: 60px 20px; color: var(--cinza); }
   .vazio .emoji { font-size: 48px; margin-bottom: 12px; }
 
@@ -1749,8 +1770,36 @@ function renderProduto(p) {
 
     <div class="dias ${cls}">${textoDias(dias)}</div>
 
+    <!-- NOVO BOTÃO DO WHATSAPP -->
+    <button class="btn-whatsapp" onclick="enviarWhatsApp('${p.nome.replace(/'/g, "\\'")}', ${qtd}, '${dataFmt}', '${promotor.loja.replace(/'/g, "\\'")}', '${promotor.cidade.replace(/'/g, "\\'")}')" title="Enviar via WhatsApp">
+      💬
+    </button>
+
     <button class="btn-editar" onclick="abrirEdicao('${p.id}')" title="Editar">✏️</button>
   </div>`;
+}
+
+// ========== WHATSAPP ==========
+function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCidade) {
+  const agora = new Date();
+  const hora = agora.getHours();
+
+  // Define a saudação
+  let saudacao = 'Bom dia';
+  if (hora >= 12 && hora < 18) {
+    saudacao = 'Boa tarde';
+  } else if (hora >= 18 || hora < 5) {
+    saudacao = 'Boa noite';
+  }
+
+  // Monta a mensagem
+  const mensagem = `${saudacao}, time! Temos ${quantidade} unidade(s) do produto ${nomeProduto} com a data de validade sendo ${dataValidade} na loja ${nomeLoja} de ${nomeCidade}`;
+
+  // Codifica a mensagem para a URL
+  const textoCodificado = encodeURIComponent(mensagem);
+
+  // Abre o WhatsApp (O usuário escolhe para quem enviar)
+  window.open(`https://wa.me/?text=${textoCodificado}`, '_blank');
 }
 
 function mostrarToast(msg, cor = '#43A047') {
