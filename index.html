@@ -1793,7 +1793,7 @@ function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCid
   }
 
   // Monta a mensagem com negrito (*) nos campos desejados
-  const mensagem = `${saudacao}, time!\nTemos *${quantidade}* unidade(s) do produto *${nomeProduto}* com a data de validade sendo *${dataValidade}* na loja ${nomeLoja} de ${nomeCidade}.`;
+  const mensagem = `${saudacao}, time!\nTemos *${quantidade} unidade(s)* do produto *${nomeProduto}* com a data de validade sendo *${dataValidade}* na loja ${nomeLoja} de ${nomeCidade}.`;
 
   // Codifica a mensagem para a URL
   const textoCodificado = encodeURIComponent(mensagem);
