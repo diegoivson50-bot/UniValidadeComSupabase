@@ -1792,11 +1792,10 @@ function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCid
     saudacao = 'Boa noite';
   }
 
-  // Monta a mensagem com quebra de linha e ponto final
-  // O \n é a quebra de linha
-  const mensagem = `${saudacao}, time!\nTemos ${quantidade} unidade(s) do produto ${nomeProduto} com a data de validade sendo ${dataValidade} na loja ${nomeLoja} de ${nomeCidade}.`;
+  // Monta a mensagem com negrito (*) nos campos desejados
+  const mensagem = `${saudacao}, time!\nTemos *${quantidade}* unidade(s) do produto *${nomeProduto}* com a data de validade sendo *${dataValidade}* na loja ${nomeLoja} de ${nomeCidade}.`;
 
-  // Codifica a mensagem para a URL (isso converte o \n em %0A)
+  // Codifica a mensagem para a URL
   const textoCodificado = encodeURIComponent(mensagem);
 
   // Abre o WhatsApp (O usuário escolhe para quem enviar)
