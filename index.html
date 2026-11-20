@@ -56,6 +56,30 @@
     min-height: 100vh; padding: 24px;
   }
 
+  /* LOGO DA TELA DE LOGIN (TAMANHO ANTIGO RESTAURADO) */
+  .logo { text-align: center; margin-bottom: 32px; }
+  .logo img {
+    width: clamp(240px, 55vw, 420px);
+    max-height: 200px;
+    height: auto;
+    margin: 0 auto 20px;
+    display: block;
+    object-fit: contain;
+  }
+  .logo h1 { font-size: 26px; color: var(--azul); }
+  .logo p { color: var(--cinza); font-size: 14px; margin-top: 4px; }
+
+  /* LOGO DA TELA DO VENDEDOR E DASHBOARD */
+  .logo-vendedor {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .logo-vendedor img {
+    width: clamp(160px, 40vw, 240px);
+    height: auto;
+    object-fit: contain;
+  }
+
   .header-topo {
     display: flex;
     flex-direction: column;
@@ -506,16 +530,7 @@
   #scanner-status.erro { color: var(--vermelho); }
   #scanner-status.sucesso { color: var(--verde); }
 
-  /* ===== ESTILOS DA ÁREA DO VENDEDOR (E LOGO PADRONIZADA) ===== */
-  .logo-vendedor {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  .logo-vendedor img {
-    width: clamp(160px, 40vw, 240px);
-    height: auto;
-    object-fit: contain;
-  }
+  /* ===== ESTILOS DA ÁREA DO VENDEDOR ===== */
   .busca-loja-container {
     margin-bottom: 16px;
   }
@@ -579,9 +594,10 @@
 <!-- ========== TELA LOGIN ========== -->
 <div id="telaLogin" class="tela ativa">
   <div class="login-wrap">
-    <!-- LOGO PADRONIZADA -->
-    <div class="logo-vendedor" style="margin-bottom: 32px;">
+    <!-- LOGO ORIGINAL RESTAURADA -->
+    <div class="logo">
       <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
+      <p>Sua melhor forma de controlar a validade dos seus produtos!</p>
     </div>
 
     <div id="camposCadastro" style="display: none;">
@@ -626,10 +642,14 @@
 
 <!-- ========== TELA DASHBOARD ========== -->
 <div id="telaDash" class="tela">
+  <!-- HEADER DO DASHBOARD (LOGO PADRONIZADA E CENTRALIZADA) -->
+  <div class="logo-vendedor" style="margin-bottom: 20px;">
+    <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
+  </div>
+  
   <div class="header-topo">
     <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%; gap:12px;">
       <div>
-        <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
         <div class="header-texto">
           <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
           <p class="sub" id="saudLoja">—</p>
@@ -712,6 +732,7 @@
 
 <!-- ========== TELA ÁREA DO VENDEDOR ========== -->
 <div id="telaVendedor" class="tela">
+  <!-- LOGO DO VENDEDOR -->
   <div class="logo-vendedor">
     <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
   </div>
