@@ -1897,7 +1897,9 @@ function renderizarLojasVendedor(lojas) {
       <div class="sub" style="font-size: 13px; color: var(--cinza); margin-bottom: 4px;">
         Promotor: ${l.promotor || 'Não informado'}
       </div>
-      <div class="sub" style="font-size: 13px; color: var(--cinza);">${l.cidade}</div>
+      <div class="sub" style="font-size: 13px; color: var(--cinza);">
+        Cidade: ${l.cidade}
+      </div>
     </div>
   `).join('');
 }
