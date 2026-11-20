@@ -678,13 +678,15 @@
     <button class="btn secundario" onclick="voltarLogin()">Voltar</button>
   </div>
 
-  <!-- Passo 2: Busca de Lojas (oculto inicialmente) -->
+  <!-- Passo 2: Lista de Lojas (oculto inicialmente) -->
   <div id="vendedorPainel" style="display: none;">
-    <div class="campo">
-      <label>Buscar Loja</label>
-      <input id="inBuscaLoja" placeholder="Digite o nome da loja..." oninput="buscarLojas(this.value)">
+    <div class="header" style="margin-top: 20px;">
+      <h2>Lojas Cadastradas</h2>
+      <p class="sub">Selecione a loja que deseja consultar.</p>
     </div>
-    <div id="resultadoLojas"></div>
+    
+    <div id="listaDeLojas"></div>
+    
     <button class="btn secundario" onclick="sairVendedor()" style="margin-top: 20px;">Sair da Área do Vendedor</button>
   </div>
 
@@ -695,7 +697,7 @@
       <p class="sub" id="cidadeLojaDetalhe"></p>
     </div>
     <div id="listaProdutosVendedor"></div>
-    <button class="btn secundario" onclick="voltarBusca()" style="margin-top: 20px;">Voltar para a Busca</button>
+    <button class="btn secundario" onclick="voltarBusca()" style="margin-top: 20px;">Voltar para a Lista de Lojas</button>
   </div>
 </div>
 
@@ -1875,27 +1877,32 @@ function validarCodigoVendedor() {
     document.getElementById('vendedorAuth').style.display = 'none';
     document.getElementById('vendedorPainel').style.display = 'block';
     mostrarToast('✓ Acesso liberado!');
+    
+    // NOVO: Carrega a lista de lojas assim que o acesso é liberado
+    carregarTodasAsLojas();
   } else {
     mostrarToast('❌ Código inválido.', '#E53935');
   }
 }
 
-async function buscarLojas(termo) {
-  const resultadoDiv = document.getElementById('resultadoLojas');
-  if (!termo || termo.length < 2) {
-    resultadoDiv.innerHTML = '';
-    return;
-  }
+// NOVA FUNÇÃO: Busca todas as lojas de todos os promotores
+async function carregarTodasAsLojas() {
+  const resultadoDiv = document.getElementById('listaDeLojas');
+  resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Carregando lojas...</p>';
 
-  // Busca no Supabase as lojas que correspondem ao termo
+  // Busca todas as lojas cadastradas no banco
   const { data: lojas, error } = await supabaseClient
     .from('produtos')
-    .select('loja, cidade, user_id')
-    .ilike('loja', `%${termo}%`)
-    .limit(10);
+    .select('loja, cidade, user_id');
 
   if (error) {
     console.error(error);
+    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--vermelho);">Erro ao carregar lojas.</p>';
+    return;
+  }
+
+  if (!lojas || lojas.length === 0) {
+    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhuma loja cadastrada no sistema ainda.</p>';
     return;
   }
 
@@ -1910,11 +1917,10 @@ async function buscarLojas(termo) {
     }
   });
 
-  if (lojasUnicas.length === 0) {
-    resultadoDiv.innerHTML = '<p style="color: var(--cinza); text-align: center; margin-top: 10px;">Nenhuma loja encontrada.</p>';
-    return;
-  }
+  // Ordena alfabeticamente pelo nome da loja
+  lojasUnicas.sort((a, b) => a.loja.localeCompare(b.loja));
 
+  // Renderiza os cards na tela
   resultadoDiv.innerHTML = lojasUnicas.map(l => `
     <div class="produto" style="cursor: pointer; border-left-color: var(--azul);" onclick="abrirLojaVendedor('${l.user_id}', '${l.loja.replace(/'/g, "\\'")}', '${l.cidade.replace(/'/g, "\\'")}')">
       <div class="nome">${l.loja}</div>
@@ -1970,8 +1976,7 @@ async function abrirLojaVendedor(userId, nomeLoja, cidade) {
 function voltarBusca() {
   document.getElementById('vendedorDetalhes').style.display = 'none';
   document.getElementById('vendedorPainel').style.display = 'block';
-  document.getElementById('inBuscaLoja').value = '';
-  document.getElementById('resultadoLojas').innerHTML = '';
+  // Não precisa mais limpar o campo de busca, pois ele não existe mais
 }
 
 function sairVendedor() {
