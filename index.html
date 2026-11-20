@@ -1851,6 +1851,7 @@ function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCid
 // Dica: Em um sistema real, os códigos deveriam vir do banco de dados.
 // Aqui usamos um exemplo estático para simplificar o teste.
 const CODIGOS_VENDEDOR = {
+  'VEND-1234': true, // Código válido
   'VEND-5678': true  // Outro código válido
 };
 
@@ -1868,59 +1869,46 @@ function voltarLogin() {
   document.getElementById('telaLogin').classList.add('ativa');
 }
 
-function validarCodigoVendedor() {
+async function validarCodigoVendedor() {
   const codigo = document.getElementById('inCodigoVendedor').value.trim().toUpperCase();
+  const btn = document.querySelector('#vendedorAuth .btn'); // Botão para dar feedback
+  btn.textContent = 'Validando...';
+  btn.disabled = true;
 
-  if (CODIGOS_VENDEDOR[codigo]) {
-    localStorage.setItem('univalidade_vendedor', codigo); // Salva para não pedir de novo
+  try {
+    // Chama a Edge Function
+    const { data, error } = await supabaseClient.functions.invoke('listar-lojas-vendedor', {
+      body: { codigo: codigo }
+    });
+
+    if (error) throw error;
+    if (data.error) throw new Error(data.error);
+
+    // Se deu certo, salva o código e mostra a lista
+    localStorage.setItem('univalidade_vendedor', codigo);
     document.getElementById('vendedorAuth').style.display = 'none';
     document.getElementById('vendedorPainel').style.display = 'block';
     mostrarToast('✓ Acesso liberado!');
     
-    // NOVO: Carrega a lista de lojas assim que o acesso é liberado
-    carregarTodasAsLojas();
-  } else {
-    mostrarToast('❌ Código inválido.', '#E53935');
+    // Renderiza a lista que veio da função
+    renderizarLojasVendedor(data.lojas);
+
+  } catch (err) {
+    console.error(err);
+    mostrarToast('❌ ' + (err.message || 'Código inválido'), '#E53935');
+  } finally {
+    btn.textContent = 'Acessar Painel';
+    btn.disabled = false;
   }
 }
 
-// NOVA FUNÇÃO: Busca todas as lojas de todos os promotores
-async function carregarTodasAsLojas() {
+function renderizarLojasVendedor(lojas) {
   const resultadoDiv = document.getElementById('listaDeLojas');
-  resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Carregando lojas...</p>';
-
-  // Busca todas as lojas cadastradas no banco
-  const { data: lojas, error } = await supabaseClient
-    .from('produtos')
-    .select('loja, cidade, user_id');
-
-  if (error) {
-    console.error(error);
-    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--vermelho);">Erro ao carregar lojas.</p>';
-    return;
-  }
-
   if (!lojas || lojas.length === 0) {
-    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhuma loja cadastrada no sistema ainda.</p>';
+    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhuma loja cadastrada.</p>';
     return;
   }
-
-  // Remove duplicatas (mesma loja e mesmo user_id)
-  const lojasUnicas = [];
-  const vistos = new Set();
-  lojas.forEach(l => {
-    const chave = `${l.loja}-${l.user_id}`;
-    if (!vistos.has(chave)) {
-      vistos.add(chave);
-      lojasUnicas.push(l);
-    }
-  });
-
-  // Ordena alfabeticamente pelo nome da loja
-  lojasUnicas.sort((a, b) => a.loja.localeCompare(b.loja));
-
-  // Renderiza os cards na tela
-  resultadoDiv.innerHTML = lojasUnicas.map(l => `
+  resultadoDiv.innerHTML = lojas.map(l => `
     <div class="produto" style="cursor: pointer; border-left-color: var(--azul);" onclick="abrirLojaVendedor('${l.user_id}', '${l.loja.replace(/'/g, "\\'")}', '${l.cidade.replace(/'/g, "\\'")}')">
       <div class="nome">${l.loja}</div>
       <div class="sub" style="font-size: 13px; color: var(--cinza);">${l.cidade}</div>
