@@ -521,6 +521,73 @@
   }
   #scanner-status.erro { color: var(--vermelho); }
   #scanner-status.sucesso { color: var(--verde); }
+
+  /* ===== ESTILOS DA ÁREA DO VENDEDOR ===== */
+  .logo-vendedor {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .logo-vendedor img {
+    width: clamp(160px, 40vw, 240px);
+    height: auto;
+    object-fit: contain;
+  }
+  .busca-loja-container {
+    margin-bottom: 16px;
+  }
+  .busca-loja-container input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #E4E8F5;
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--card);
+    transition: .2s;
+  }
+  .busca-loja-container input:focus {
+    outline: none;
+    border-color: var(--azul-claro);
+    box-shadow: 0 0 0 4px rgba(74,99,231,.1);
+  }
+
+  /* ===== FILTROS DE PRODUTOS (VENDEDOR) ===== */
+  .filtros-vendedor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .filtros-vendedor select, .filtros-vendedor input {
+    padding: 8px 12px;
+    border: 2px solid #E4E8F5;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--texto);
+    flex: 1;
+    min-width: 120px;
+    transition: .2s;
+  }
+  .filtros-vendedor select:focus, .filtros-vendedor input:focus {
+    outline: none;
+    border-color: var(--azul-claro);
+  }
+  .btn-limpar-filtro {
+    background: #FFEBEE;
+    border: none;
+    color: var(--vermelho);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .2s;
+  }
+  .btn-limpar-filtro:active { transform: scale(.95); }
 </style>
 </head>
 <body>
@@ -661,9 +728,9 @@
 
 <!-- ========== TELA ÁREA DO VENDEDOR ========== -->
 <div id="telaVendedor" class="tela">
-  <div class="header">
-    <h2>Área do Vendedor</h2>
-    <p class="sub">Digite o código de acesso fornecido pelo promotor.</p>
+  <!-- NOVO: Logo no lugar do texto -->
+  <div class="logo-vendedor">
+    <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
   </div>
 
   <div id="vendedorAuth">
@@ -681,6 +748,11 @@
       <p class="sub">Selecione a loja que deseja consultar.</p>
     </div>
     
+    <!-- NOVO: Barra de busca por loja -->
+    <div class="busca-loja-container">
+      <input id="inBuscaLoja" placeholder="Buscar loja..." oninput="filtrarLojasVendedor(this.value)">
+    </div>
+
     <div id="listaDeLojas"></div>
     
     <button class="btn secundario" onclick="sairVendedor()" style="margin-top: 20px;">Sair da Área do Vendedor</button>
@@ -691,6 +763,23 @@
       <h2 id="nomeLojaDetalhe"></h2>
       <p class="sub" id="cidadeLojaDetalhe"></p>
     </div>
+
+    <!-- NOVO: Filtros de produtos -->
+    <div class="filtros-vendedor">
+      <select id="filtroCategoriaVendedor" onchange="aplicarFiltrosVendedor()">
+        <option value="">Categoria (todas)</option>
+      </select>
+      <input id="filtroMarcaVendedor" placeholder="Marca" oninput="aplicarFiltrosVendedor()">
+      <select id="filtroValidadeVendedor" onchange="aplicarFiltrosVendedor()">
+        <option value="">Validade (todas)</option>
+        <option value="7">Vence em até 7 dias</option>
+        <option value="15">Vence em até 15 dias</option>
+        <option value="30">Vence em até 30 dias</option>
+        <option value="vencido">Já vencidos</option>
+      </select>
+      <button class="btn-limpar-filtro" onclick="limparFiltrosVendedor()">Limpar</button>
+    </div>
+
     <div id="listaProdutosVendedor"></div>
     <button class="btn secundario" onclick="voltarBusca()" style="margin-top: 20px;">Voltar para a Lista de Lojas</button>
   </div>
@@ -1841,6 +1930,9 @@ const CODIGOS_VENDEDOR = {
   'VEND-5678': true
 };
 
+let lojasVendedorCache = [];
+let produtosVendedorCache = [];
+
 function abrirAreaVendedor() {
   document.getElementById('telaLogin').classList.remove('ativa');
   document.getElementById('telaVendedor').classList.add('ativa');
@@ -1874,7 +1966,9 @@ async function validarCodigoVendedor() {
     document.getElementById('vendedorPainel').style.display = 'block';
     mostrarToast('✓ Acesso liberado!');
     
-    renderizarLojasVendedor(data.lojas);
+    lojasVendedorCache = data.lojas || [];
+    document.getElementById('inBuscaLoja').value = '';
+    renderizarLojasVendedor(lojasVendedorCache);
 
   } catch (err) {
     console.error(err);
@@ -1885,10 +1979,21 @@ async function validarCodigoVendedor() {
   }
 }
 
+// NOVO: Filtro de lojas por busca
+function filtrarLojasVendedor(termo) {
+  const t = (termo || '').toLowerCase();
+  const filtradas = lojasVendedorCache.filter(l =>
+    l.loja.toLowerCase().includes(t) ||
+    (l.cidade && l.cidade.toLowerCase().includes(t)) ||
+    (l.promotor && l.promotor.toLowerCase().includes(t))
+  );
+  renderizarLojasVendedor(filtradas);
+}
+
 function renderizarLojasVendedor(lojas) {
   const resultadoDiv = document.getElementById('listaDeLojas');
   if (!lojas || lojas.length === 0) {
-    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhuma loja cadastrada.</p>';
+    resultadoDiv.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhuma loja encontrada.</p>';
     return;
   }
   resultadoDiv.innerHTML = lojas.map(l => `
@@ -1923,35 +2028,89 @@ async function abrirLojaVendedor(userId, nomeLoja, cidade) {
     if (error) throw error;
     if (data.error) throw new Error(data.error);
 
-    const prods = data.produtos;
-    
-    if (!prods || prods.length === 0) {
-      lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhum produto cadastrado nesta loja.</p>';
-      return;
-    }
+    produtosVendedorCache = data.produtos || [];
 
-    lista.innerHTML = prods.map(p => {
-      const dias = diasRestantes(p.validade);
-      const cls = classeDias(dias);
-      const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
-      const qtd = p.quantidade || 1;
+    // Preenche o filtro de categorias
+    const selectCat = document.getElementById('filtroCategoriaVendedor');
+    const catsUnicas = [...new Set(produtosVendedorCache.map(p => p.categoria).filter(Boolean))].sort();
+    selectCat.innerHTML = '<option value="">Categoria (todas)</option>' +
+      catsUnicas.map(c => `<option value="${c}">${c}</option>`).join('');
 
-      return `<div class="produto ${cls}">
-        <span class="cat-badge">${p.categoria}</span>
-        <div class="nome">${p.nome}</div>
-        <div class="info-destaque">
-          <span class="info-item unidades">📦 ${qtd} unidade(s)</span>
-          <span class="info-item validade ${cls}">📅 ${dataFmt}</span>
-        </div>
-        <div class="dias ${cls}">${textoDias(dias)}</div>
-      </div>`;
-    }).join('');
+    // Limpa os outros filtros
+    document.getElementById('filtroMarcaVendedor').value = '';
+    document.getElementById('filtroValidadeVendedor').value = '';
+
+    aplicarFiltrosVendedor();
 
   } catch (err) {
     console.error(err);
     lista.innerHTML = '<p style="text-align: center; color: var(--vermelho);">Erro ao carregar produtos.</p>';
     mostrarToast('❌ Erro ao carregar produtos', '#E53935');
   }
+}
+
+// NOVO: Aplica os filtros de categoria, marca e validade
+function aplicarFiltrosVendedor() {
+  const cat = document.getElementById('filtroCategoriaVendedor').value;
+  const marca = document.getElementById('filtroMarcaVendedor').value.trim().toLowerCase();
+  const validadeFiltro = document.getElementById('filtroValidadeVendedor').value;
+
+  let filtrados = produtosVendedorCache;
+
+  if (cat) {
+    filtrados = filtrados.filter(p => p.categoria === cat);
+  }
+
+  if (marca) {
+    filtrados = filtrados.filter(p => (p.marca || '').toLowerCase().includes(marca));
+  }
+
+  if (validadeFiltro) {
+    if (validadeFiltro === 'vencido') {
+      filtrados = filtrados.filter(p => diasRestantes(p.validade) < 0);
+    } else {
+      const limite = parseInt(validadeFiltro);
+      filtrados = filtrados.filter(p => {
+        const d = diasRestantes(p.validade);
+        return d >= 0 && d <= limite;
+      });
+    }
+  }
+
+  renderizarProdutosVendedor(filtrados);
+}
+
+function limparFiltrosVendedor() {
+  document.getElementById('filtroCategoriaVendedor').value = '';
+  document.getElementById('filtroMarcaVendedor').value = '';
+  document.getElementById('filtroValidadeVendedor').value = '';
+  aplicarFiltrosVendedor();
+}
+
+function renderizarProdutosVendedor(prods) {
+  const lista = document.getElementById('listaProdutosVendedor');
+  
+  if (!prods || prods.length === 0) {
+    lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhum produto encontrado com esses filtros.</p>';
+    return;
+  }
+
+  lista.innerHTML = prods.map(p => {
+    const dias = diasRestantes(p.validade);
+    const cls = classeDias(dias);
+    const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
+    const qtd = p.quantidade || 1;
+
+    return `<div class="produto ${cls}">
+      <span class="cat-badge">${p.categoria}</span>
+      <div class="nome">${p.nome}</div>
+      <div class="info-destaque">
+        <span class="info-item unidades">📦 ${qtd} unidade(s)</span>
+        <span class="info-item validade ${cls}">📅 ${dataFmt}</span>
+      </div>
+      <div class="dias ${cls}">${textoDias(dias)}</div>
+    </div>`;
+  }).join('');
 }
 
 function voltarBusca() {
@@ -1986,11 +2145,6 @@ window.onload = async () => {
       notificacoesAtivas = true;
       document.getElementById('btnNotificacao').classList.add('ativo');
     }
-  }
-
-  const codigoSalvo = localStorage.getItem('univalidade_vendedor');
-  if (codigoSalvo && CODIGOS_VENDEDOR[codigoSalvo]) {
-    // Opcional: redirecionar automaticamente
   }
 
   try {
