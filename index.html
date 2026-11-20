@@ -55,15 +55,7 @@
     display: flex; flex-direction: column; justify-content: center;
     min-height: 100vh; padding: 24px;
   }
-  .logo { text-align: center; margin-bottom: 32px; }
-  .logo img {
-    width: clamp(240px, 55vw, 420px);
-    max-height: 200px;
-    height: auto;
-    margin: 0 auto 20px;
-    display: block;
-    object-fit: contain;
-  }
+
   .header-topo {
     display: flex;
     flex-direction: column;
@@ -82,14 +74,6 @@
     font-size: 13px;
     margin-top: 2px;
   }
-  .logo-circle {
-    width: 80px; height: 80px; margin: 0 auto 16px;
-    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
-    border-radius: 24px; display: flex; align-items: center; justify-content: center;
-    font-size: 40px; box-shadow: var(--sombra);
-  }
-  .logo h1 { font-size: 26px; color: var(--azul); }
-  .logo p { color: var(--cinza); font-size: 14px; margin-top: 4px; }
 
   .campo { margin-bottom: 16px; }
   .campo label {
@@ -522,7 +506,7 @@
   #scanner-status.erro { color: var(--vermelho); }
   #scanner-status.sucesso { color: var(--verde); }
 
-  /* ===== ESTILOS DA ÁREA DO VENDEDOR ===== */
+  /* ===== ESTILOS DA ÁREA DO VENDEDOR (E LOGO PADRONIZADA) ===== */
   .logo-vendedor {
     text-align: center;
     margin-bottom: 24px;
@@ -595,9 +579,9 @@
 <!-- ========== TELA LOGIN ========== -->
 <div id="telaLogin" class="tela ativa">
   <div class="login-wrap">
-    <div class="logo">
+    <!-- LOGO PADRONIZADA -->
+    <div class="logo-vendedor" style="margin-bottom: 32px;">
       <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
-      <p>Sua melhor forma de controlar a validade dos seus produtos!</p>
     </div>
 
     <div id="camposCadastro" style="display: none;">
@@ -728,7 +712,6 @@
 
 <!-- ========== TELA ÁREA DO VENDEDOR ========== -->
 <div id="telaVendedor" class="tela">
-  <!-- NOVO: Logo no lugar do texto -->
   <div class="logo-vendedor">
     <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
   </div>
@@ -748,7 +731,6 @@
       <p class="sub">Selecione a loja que deseja consultar.</p>
     </div>
     
-    <!-- NOVO: Barra de busca por loja -->
     <div class="busca-loja-container">
       <input id="inBuscaLoja" placeholder="Buscar loja..." oninput="filtrarLojasVendedor(this.value)">
     </div>
@@ -764,7 +746,6 @@
       <p class="sub" id="cidadeLojaDetalhe"></p>
     </div>
 
-    <!-- NOVO: Filtros de produtos -->
     <div class="filtros-vendedor">
       <select id="filtroCategoriaVendedor" onchange="aplicarFiltrosVendedor()">
         <option value="">Categoria (todas)</option>
