@@ -401,11 +401,10 @@
   }
   .btn-editar:active { transform: scale(.9); }
 
-  /* NOVO: Estilo do botão do WhatsApp */
   .btn-whatsapp {
     position: absolute;
     bottom: 10px;
-    right: 54px; /* Posiciona ao lado do botão de editar */
+    right: 54px;
     background: #E8F5E9;
     border: none;
     color: #25D366;
@@ -568,7 +567,6 @@
       <a href="#" id="linkAlternar" onclick="alternarModo()" style="color: var(--azul); font-weight: 600;">Criar conta</a>
     </p>
 
-    <!-- NOVO BOTÃO ÁREA DO VENDEDOR -->
     <p style="text-align: center; margin-top: 8px;">
       <a href="#" onclick="abrirAreaVendedor()" style="color: var(--cinza); font-weight: 600; font-size: 13px;">🔑 Área do Vendedor</a>
     </p>
@@ -668,7 +666,6 @@
     <p class="sub">Digite o código de acesso fornecido pelo promotor.</p>
   </div>
 
-  <!-- Passo 1: Inserir Código -->
   <div id="vendedorAuth">
     <div class="campo">
       <label>Código de Acesso</label>
@@ -678,7 +675,6 @@
     <button class="btn secundario" onclick="voltarLogin()">Voltar</button>
   </div>
 
-  <!-- Passo 2: Lista de Lojas (oculto inicialmente) -->
   <div id="vendedorPainel" style="display: none;">
     <div class="header" style="margin-top: 20px;">
       <h2>Lojas Cadastradas</h2>
@@ -690,7 +686,6 @@
     <button class="btn secundario" onclick="sairVendedor()" style="margin-top: 20px;">Sair da Área do Vendedor</button>
   </div>
 
-  <!-- Passo 3: Detalhes da Loja (oculto inicialmente) -->
   <div id="vendedorDetalhes" style="display: none;">
     <div class="header" style="margin-top: 20px;">
       <h2 id="nomeLojaDetalhe"></h2>
@@ -967,7 +962,6 @@ async function vincularOneSignal(userId) {
 }
 
 async function toggleNotificacoes() {
-  // Ativa/desativa as notificações locais (banner/badge) e tenta pedir permissão do navegador
   if (!('Notification' in window)) {
     mostrarToast('Este navegador não suporta notificações.', '#E53935');
     return;
@@ -1003,7 +997,6 @@ async function toggleNotificacoes() {
     mostrarToast('✓ Notificações ativadas!');
     verificarNotificacoes();
 
-    // Também tenta registrar no OneSignal (Web Push)
     try {
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
@@ -1202,7 +1195,6 @@ async function iniciarDashboard(user) {
   };
   emailUsuario = user.email || '';
 
-  // Vincula usuário ao OneSignal
   await vincularOneSignal(user.id);
 
   document.getElementById('saudNome').textContent = promotor.nome.split(' ')[0];
@@ -1829,7 +1821,6 @@ function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCid
   const agora = new Date();
   const hora = agora.getHours();
 
-  // Define a saudação
   let saudacao = 'Bom dia';
   if (hora >= 12 && hora < 18) {
     saudacao = 'Boa tarde';
@@ -1837,22 +1828,17 @@ function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCid
     saudacao = 'Boa noite';
   }
 
-  // Monta a mensagem com quebra de linha e negrito
   const mensagem = `${saudacao}, time!\nTemos *${quantidade}* unidade(s) do produto *${nomeProduto}* com a data de validade sendo *${dataValidade}* na loja ${nomeLoja} de ${nomeCidade}.`;
 
-  // Codifica a mensagem para a URL
   const textoCodificado = encodeURIComponent(mensagem);
 
-  // Abre o WhatsApp (O usuário escolhe para quem enviar)
   window.open(`https://wa.me/?text=${textoCodificado}`, '_blank');
 }
 
 // ========== ÁREA DO VENDEDOR ==========
-// Dica: Em um sistema real, os códigos deveriam vir do banco de dados.
-// Aqui usamos um exemplo estático para simplificar o teste.
 const CODIGOS_VENDEDOR = {
-  'VEND-1234': true, // Código válido
-  'VEND-5678': true  // Outro código válido
+  'VEND-1234': true,
+  'VEND-5678': true
 };
 
 function abrirAreaVendedor() {
@@ -1871,12 +1857,11 @@ function voltarLogin() {
 
 async function validarCodigoVendedor() {
   const codigo = document.getElementById('inCodigoVendedor').value.trim().toUpperCase();
-  const btn = document.querySelector('#vendedorAuth .btn'); // Botão para dar feedback
+  const btn = document.querySelector('#vendedorAuth .btn');
   btn.textContent = 'Validando...';
   btn.disabled = true;
 
   try {
-    // Chama a Edge Function
     const { data, error } = await supabaseClient.functions.invoke('listar-lojas-vendedor', {
       body: { codigo: codigo }
     });
@@ -1884,13 +1869,11 @@ async function validarCodigoVendedor() {
     if (error) throw error;
     if (data.error) throw new Error(data.error);
 
-    // Se deu certo, salva o código e mostra a lista
     localStorage.setItem('univalidade_vendedor', codigo);
     document.getElementById('vendedorAuth').style.display = 'none';
     document.getElementById('vendedorPainel').style.display = 'block';
     mostrarToast('✓ Acesso liberado!');
     
-    // Renderiza a lista que veio da função
     renderizarLojasVendedor(data.lojas);
 
   } catch (err) {
@@ -1911,6 +1894,9 @@ function renderizarLojasVendedor(lojas) {
   resultadoDiv.innerHTML = lojas.map(l => `
     <div class="produto" style="cursor: pointer; border-left-color: var(--azul);" onclick="abrirLojaVendedor('${l.user_id}', '${l.loja.replace(/'/g, "\\'")}', '${l.cidade.replace(/'/g, "\\'")}')">
       <div class="nome">${l.loja}</div>
+      <div class="sub" style="font-size: 13px; color: var(--cinza); margin-bottom: 4px;">
+        Promotor: ${l.promotor || 'Não informado'}
+      </div>
       <div class="sub" style="font-size: 13px; color: var(--cinza);">${l.cidade}</div>
     </div>
   `).join('');
@@ -1921,54 +1907,59 @@ async function abrirLojaVendedor(userId, nomeLoja, cidade) {
   document.getElementById('vendedorDetalhes').style.display = 'block';
   document.getElementById('nomeLojaDetalhe').textContent = nomeLoja;
   document.getElementById('cidadeLojaDetalhe').textContent = cidade;
-
-  // Busca os produtos daquela loja específica (do promotor dono)
-  const { data: prods, error } = await supabaseClient
-    .from('produtos')
-    .select('nome, quantidade, validade, categoria')
-    .eq('user_id', userId)
-    .order('validade', { ascending: true });
-
-  if (error) {
-    mostrarToast('Erro ao buscar produtos.', '#E53935');
-    return;
-  }
-
-  const lista = document.getElementById('listaProdutosVendedor');
   
-  if (!prods || prods.length === 0) {
-    lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhum produto cadastrado nesta loja.</p>';
-    return;
+  const lista = document.getElementById('listaProdutosVendedor');
+  lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Carregando produtos...</p>';
+
+  try {
+    const codigo = localStorage.getItem('univalidade_vendedor');
+    
+    const { data, error } = await supabaseClient.functions.invoke('listar-lojas-vendedor', {
+      body: { codigo: codigo, acao: 'buscar_produtos', userId: userId }
+    });
+
+    if (error) throw error;
+    if (data.error) throw new Error(data.error);
+
+    const prods = data.produtos;
+    
+    if (!prods || prods.length === 0) {
+      lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhum produto cadastrado nesta loja.</p>';
+      return;
+    }
+
+    lista.innerHTML = prods.map(p => {
+      const dias = diasRestantes(p.validade);
+      const cls = classeDias(dias);
+      const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
+      const qtd = p.quantidade || 1;
+
+      return `<div class="produto ${cls}">
+        <span class="cat-badge">${p.categoria}</span>
+        <div class="nome">${p.nome}</div>
+        <div class="info-destaque">
+          <span class="info-item unidades">📦 ${qtd} unidade(s)</span>
+          <span class="info-item validade ${cls}">📅 ${dataFmt}</span>
+        </div>
+        <div class="dias ${cls}">${textoDias(dias)}</div>
+      </div>`;
+    }).join('');
+
+  } catch (err) {
+    console.error(err);
+    lista.innerHTML = '<p style="text-align: center; color: var(--vermelho);">Erro ao carregar produtos.</p>';
+    mostrarToast('❌ Erro ao carregar produtos', '#E53935');
   }
-
-  // Reutiliza a função renderProduto, mas sem os botões de editar/excluir
-  lista.innerHTML = prods.map(p => {
-    const dias = diasRestantes(p.validade);
-    const cls = classeDias(dias);
-    const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
-    const qtd = p.quantidade || 1;
-
-    return `<div class="produto ${cls}">
-      <span class="cat-badge">${p.categoria}</span>
-      <div class="nome">${p.nome}</div>
-      <div class="info-destaque">
-        <span class="info-item unidades">📦 ${qtd} unidade(s)</span>
-        <span class="info-item validade ${cls}">📅 ${dataFmt}</span>
-      </div>
-      <div class="dias ${cls}">${textoDias(dias)}</div>
-    </div>`;
-  }).join('');
 }
 
 function voltarBusca() {
   document.getElementById('vendedorDetalhes').style.display = 'none';
   document.getElementById('vendedorPainel').style.display = 'block';
-  // Não precisa mais limpar o campo de busca, pois ele não existe mais
 }
 
 function sairVendedor() {
   localStorage.removeItem('univalidade_vendedor');
-  abrirAreaVendedor(); // Volta para a tela de código
+  abrirAreaVendedor();
 }
 
 function mostrarToast(msg, cor = '#43A047') {
@@ -1987,7 +1978,6 @@ window.onload = async () => {
 
   carregarBaseProdutos();
 
-  // Restaura preferência de notificações
   if ('Notification' in window && Notification.permission === 'granted') {
     const pref = localStorage.getItem('univalidade_notif');
     if (pref === 'on') {
@@ -1996,11 +1986,9 @@ window.onload = async () => {
     }
   }
 
-  // Verifica se o vendedor já tem um código salvo
   const codigoSalvo = localStorage.getItem('univalidade_vendedor');
   if (codigoSalvo && CODIGOS_VENDEDOR[codigoSalvo]) {
-    // Se estiver na tela de login, poderia redirecionar automaticamente,
-    // mas por segurança, deixamos o botão "Área do Vendedor" disponível.
+    // Opcional: redirecionar automaticamente
   }
 
   try {
@@ -2012,7 +2000,6 @@ window.onload = async () => {
     console.error('Erro ao restaurar sessão:', e);
   }
 
-  // Re-verifica a cada 5 minutos
   setInterval(() => {
     if (produtos.length > 0) {
       atualizarBadgeNotificacao();
