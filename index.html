@@ -567,6 +567,11 @@
     <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--cinza);">
       <a href="#" id="linkAlternar" onclick="alternarModo()" style="color: var(--azul); font-weight: 600;">Criar conta</a>
     </p>
+
+    <!-- NOVO BOTÃO ÁREA DO VENDEDOR -->
+    <p style="text-align: center; margin-top: 8px;">
+      <a href="#" onclick="abrirAreaVendedor()" style="color: var(--cinza); font-weight: 600; font-size: 13px;">🔑 Área do Vendedor</a>
+    </p>
   </div>
 </div>
 
@@ -654,6 +659,44 @@
   </div>
 
   <button class="btn secundario" onclick="alterarSenhaPerfil()">🔑 Alterar Senha</button>
+</div>
+
+<!-- ========== TELA ÁREA DO VENDEDOR ========== -->
+<div id="telaVendedor" class="tela">
+  <div class="header">
+    <h2>Área do Vendedor</h2>
+    <p class="sub">Digite o código de acesso fornecido pelo promotor.</p>
+  </div>
+
+  <!-- Passo 1: Inserir Código -->
+  <div id="vendedorAuth">
+    <div class="campo">
+      <label>Código de Acesso</label>
+      <input id="inCodigoVendedor" placeholder="Ex: VEND-1234" style="text-transform: uppercase;">
+    </div>
+    <button class="btn" onclick="validarCodigoVendedor()">Acessar Painel</button>
+    <button class="btn secundario" onclick="voltarLogin()">Voltar</button>
+  </div>
+
+  <!-- Passo 2: Busca de Lojas (oculto inicialmente) -->
+  <div id="vendedorPainel" style="display: none;">
+    <div class="campo">
+      <label>Buscar Loja</label>
+      <input id="inBuscaLoja" placeholder="Digite o nome da loja..." oninput="buscarLojas(this.value)">
+    </div>
+    <div id="resultadoLojas"></div>
+    <button class="btn secundario" onclick="sairVendedor()" style="margin-top: 20px;">Sair da Área do Vendedor</button>
+  </div>
+
+  <!-- Passo 3: Detalhes da Loja (oculto inicialmente) -->
+  <div id="vendedorDetalhes" style="display: none;">
+    <div class="header" style="margin-top: 20px;">
+      <h2 id="nomeLojaDetalhe"></h2>
+      <p class="sub" id="cidadeLojaDetalhe"></p>
+    </div>
+    <div id="listaProdutosVendedor"></div>
+    <button class="btn secundario" onclick="voltarBusca()" style="margin-top: 20px;">Voltar para a Busca</button>
+  </div>
 </div>
 
 <!-- ========== BOTÃO FLUTUANTE ========== -->
@@ -1792,14 +1835,148 @@ function enviarWhatsApp(nomeProduto, quantidade, dataValidade, nomeLoja, nomeCid
     saudacao = 'Boa noite';
   }
 
-  // Monta a mensagem com negrito (*) nos campos desejados
-  const mensagem = `${saudacao}, time!\nTemos *${quantidade} unidade(s)* do produto *${nomeProduto}* com a data de validade sendo *${dataValidade}* na loja ${nomeLoja} de ${nomeCidade}.`;
+  // Monta a mensagem com quebra de linha e negrito
+  const mensagem = `${saudacao}, time!\nTemos *${quantidade}* unidade(s) do produto *${nomeProduto}* com a data de validade sendo *${dataValidade}* na loja ${nomeLoja} de ${nomeCidade}.`;
 
   // Codifica a mensagem para a URL
   const textoCodificado = encodeURIComponent(mensagem);
 
   // Abre o WhatsApp (O usuário escolhe para quem enviar)
   window.open(`https://wa.me/?text=${textoCodificado}`, '_blank');
+}
+
+// ========== ÁREA DO VENDEDOR ==========
+// Dica: Em um sistema real, os códigos deveriam vir do banco de dados.
+// Aqui usamos um exemplo estático para simplificar o teste.
+const CODIGOS_VENDEDOR = {
+  'VEND-1234': true, // Código válido
+  'VEND-5678': true  // Outro código válido
+};
+
+function abrirAreaVendedor() {
+  document.getElementById('telaLogin').classList.remove('ativa');
+  document.getElementById('telaVendedor').classList.add('ativa');
+  document.getElementById('vendedorAuth').style.display = 'block';
+  document.getElementById('vendedorPainel').style.display = 'none';
+  document.getElementById('vendedorDetalhes').style.display = 'none';
+  document.getElementById('inCodigoVendedor').value = '';
+}
+
+function voltarLogin() {
+  document.getElementById('telaVendedor').classList.remove('ativa');
+  document.getElementById('telaLogin').classList.add('ativa');
+}
+
+function validarCodigoVendedor() {
+  const codigo = document.getElementById('inCodigoVendedor').value.trim().toUpperCase();
+
+  if (CODIGOS_VENDEDOR[codigo]) {
+    localStorage.setItem('univalidade_vendedor', codigo); // Salva para não pedir de novo
+    document.getElementById('vendedorAuth').style.display = 'none';
+    document.getElementById('vendedorPainel').style.display = 'block';
+    mostrarToast('✓ Acesso liberado!');
+  } else {
+    mostrarToast('❌ Código inválido.', '#E53935');
+  }
+}
+
+async function buscarLojas(termo) {
+  const resultadoDiv = document.getElementById('resultadoLojas');
+  if (!termo || termo.length < 2) {
+    resultadoDiv.innerHTML = '';
+    return;
+  }
+
+  // Busca no Supabase as lojas que correspondem ao termo
+  const { data: lojas, error } = await supabaseClient
+    .from('produtos')
+    .select('loja, cidade, user_id')
+    .ilike('loja', `%${termo}%`)
+    .limit(10);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // Remove duplicatas (mesma loja e mesmo user_id)
+  const lojasUnicas = [];
+  const vistos = new Set();
+  lojas.forEach(l => {
+    const chave = `${l.loja}-${l.user_id}`;
+    if (!vistos.has(chave)) {
+      vistos.add(chave);
+      lojasUnicas.push(l);
+    }
+  });
+
+  if (lojasUnicas.length === 0) {
+    resultadoDiv.innerHTML = '<p style="color: var(--cinza); text-align: center; margin-top: 10px;">Nenhuma loja encontrada.</p>';
+    return;
+  }
+
+  resultadoDiv.innerHTML = lojasUnicas.map(l => `
+    <div class="produto" style="cursor: pointer; border-left-color: var(--azul);" onclick="abrirLojaVendedor('${l.user_id}', '${l.loja.replace(/'/g, "\\'")}', '${l.cidade.replace(/'/g, "\\'")}')">
+      <div class="nome">${l.loja}</div>
+      <div class="sub" style="font-size: 13px; color: var(--cinza);">${l.cidade}</div>
+    </div>
+  `).join('');
+}
+
+async function abrirLojaVendedor(userId, nomeLoja, cidade) {
+  document.getElementById('vendedorPainel').style.display = 'none';
+  document.getElementById('vendedorDetalhes').style.display = 'block';
+  document.getElementById('nomeLojaDetalhe').textContent = nomeLoja;
+  document.getElementById('cidadeLojaDetalhe').textContent = cidade;
+
+  // Busca os produtos daquela loja específica (do promotor dono)
+  const { data: prods, error } = await supabaseClient
+    .from('produtos')
+    .select('nome, quantidade, validade, categoria')
+    .eq('user_id', userId)
+    .order('validade', { ascending: true });
+
+  if (error) {
+    mostrarToast('Erro ao buscar produtos.', '#E53935');
+    return;
+  }
+
+  const lista = document.getElementById('listaProdutosVendedor');
+  
+  if (!prods || prods.length === 0) {
+    lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhum produto cadastrado nesta loja.</p>';
+    return;
+  }
+
+  // Reutiliza a função renderProduto, mas sem os botões de editar/excluir
+  lista.innerHTML = prods.map(p => {
+    const dias = diasRestantes(p.validade);
+    const cls = classeDias(dias);
+    const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
+    const qtd = p.quantidade || 1;
+
+    return `<div class="produto ${cls}">
+      <span class="cat-badge">${p.categoria}</span>
+      <div class="nome">${p.nome}</div>
+      <div class="info-destaque">
+        <span class="info-item unidades">📦 ${qtd} unidade(s)</span>
+        <span class="info-item validade ${cls}">📅 ${dataFmt}</span>
+      </div>
+      <div class="dias ${cls}">${textoDias(dias)}</div>
+    </div>`;
+  }).join('');
+}
+
+function voltarBusca() {
+  document.getElementById('vendedorDetalhes').style.display = 'none';
+  document.getElementById('vendedorPainel').style.display = 'block';
+  document.getElementById('inBuscaLoja').value = '';
+  document.getElementById('resultadoLojas').innerHTML = '';
+}
+
+function sairVendedor() {
+  localStorage.removeItem('univalidade_vendedor');
+  abrirAreaVendedor(); // Volta para a tela de código
 }
 
 function mostrarToast(msg, cor = '#43A047') {
@@ -1825,6 +2002,13 @@ window.onload = async () => {
       notificacoesAtivas = true;
       document.getElementById('btnNotificacao').classList.add('ativo');
     }
+  }
+
+  // Verifica se o vendedor já tem um código salvo
+  const codigoSalvo = localStorage.getItem('univalidade_vendedor');
+  if (codigoSalvo && CODIGOS_VENDEDOR[codigoSalvo]) {
+    // Se estiver na tela de login, poderia redirecionar automaticamente,
+    // mas por segurança, deixamos o botão "Área do Vendedor" disponível.
   }
 
   try {
