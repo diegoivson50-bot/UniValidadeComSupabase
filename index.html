@@ -16,9 +16,7 @@
       safari_web_id: "web.onesignal.auto.0d123f70-12e5-49b1-a758-f1abcc853120",
       serviceWorkerPath: "UniValidadeComSupabase/OneSignalSDKWorker.js",
       serviceWorkerParam: { scope: "/UniValidadeComSupabase/" },
-      notifyButton: {
-        enable: false,
-      },
+      notifyButton: { enable: false },
     });
   });
 </script>
@@ -56,7 +54,6 @@
     min-height: 100vh; padding: 24px;
   }
 
-  /* LOGO DA TELA DE LOGIN (TAMANHO ANTIGO RESTAURADO) */
   .logo { text-align: center; margin-bottom: 32px; }
   .logo img {
     width: clamp(240px, 55vw, 420px);
@@ -69,11 +66,7 @@
   .logo h1 { font-size: 26px; color: var(--azul); }
   .logo p { color: var(--cinza); font-size: 14px; margin-top: 4px; }
 
-  /* LOGO DA TELA DO VENDEDOR E DASHBOARD */
-  .logo-vendedor {
-    text-align: center;
-    margin-bottom: 24px;
-  }
+  .logo-vendedor { text-align: center; margin-bottom: 24px; }
   .logo-vendedor img {
     width: clamp(160px, 40vw, 240px);
     height: auto;
@@ -81,23 +74,12 @@
   }
 
   .header-topo {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 20px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 8px; margin-bottom: 20px;
   }
-  .header-topo img {
-    width: clamp(80px, 22vw, 130px);
-    height: auto;
-    display: block;
-  }
+  .header-topo img { width: clamp(80px, 22vw, 130px); height: auto; display: block; }
   .header-topo .header-texto h2 { font-size: 20px; }
-  .header-topo .header-texto .sub {
-    color: var(--cinza);
-    font-size: 13px;
-    margin-top: 2px;
-  }
+  .header-topo .header-texto .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
 
   .campo { margin-bottom: 16px; }
   .campo label {
@@ -113,31 +95,16 @@
     outline: none; border-color: var(--azul-claro);
     box-shadow: 0 0 0 4px rgba(74,99,231,.1);
   }
-  .campo input:disabled {
-    background: #F0F2FA;
-    color: var(--cinza);
-    cursor: not-allowed;
-  }
+  .campo input:disabled { background: #F0F2FA; color: var(--cinza); cursor: not-allowed; }
 
-  .campo-ean {
-    display: flex;
-    gap: 8px;
-    align-items: stretch;
-  }
+  .campo-ean { display: flex; gap: 8px; align-items: stretch; }
   .campo-ean input { flex: 1; }
   .btn-escanear {
-    padding: 0 18px;
-    border: none;
-    border-radius: 14px;
+    padding: 0 18px; border: none; border-radius: 14px;
     background: linear-gradient(135deg, var(--azul), var(--azul-claro));
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-    transition: .2s;
+    color: #fff; font-size: 22px; cursor: pointer; transition: .2s;
     box-shadow: 0 4px 12px rgba(31,54,199,.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     min-width: 56px;
   }
   .btn-escanear:active { transform: scale(.95); }
@@ -151,10 +118,7 @@
   }
   .btn:active { transform: scale(.97); }
   .btn.secundario {
-    background: #EEF1FF;
-    color: var(--azul);
-    box-shadow: none;
-    margin-top: 10px;
+    background: #EEF1FF; color: var(--azul); box-shadow: none; margin-top: 10px;
   }
 
   .header { margin-bottom: 20px; }
@@ -162,14 +126,10 @@
   .header .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
 
   .alerta-vencimento {
-    display: none;
-    align-items: center;
-    gap: 12px;
+    display: none; align-items: center; gap: 12px;
     background: linear-gradient(135deg, #FFF8E1, #FFECB3);
-    border: 2px solid #FFB300;
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
+    border: 2px solid #FFB300; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba(255,179,0,.15);
     animation: fade .3s ease;
   }
@@ -180,24 +140,15 @@
     box-shadow: 0 4px 12px rgba(229,57,53,.15);
   }
   .alerta-vencimento .alerta-icone { font-size: 28px; flex-shrink: 0; }
-  .alerta-vencimento .alerta-texto {
-    flex: 1; font-size: 13px; font-weight: 600; color: #7A4F00; line-height: 1.4;
-  }
+  .alerta-vencimento .alerta-texto { flex: 1; font-size: 13px; font-weight: 600; color: #7A4F00; line-height: 1.4; }
   .alerta-vencimento.critico .alerta-texto { color: #B71C1C; }
   .alerta-vencimento .alerta-texto strong { font-size: 15px; display: block; margin-bottom: 2px; }
 
   .btn-notificacao {
-    position: relative;
-    background: var(--card);
-    border: 2px solid #E4E8F5;
-    border-radius: 12px;
-    padding: 8px 12px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: .2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    position: relative; background: var(--card);
+    border: 2px solid #E4E8F5; border-radius: 12px;
+    padding: 8px 12px; font-size: 18px; cursor: pointer; transition: .2s;
+    display: flex; align-items: center; gap: 6px;
   }
   .btn-notificacao:active { transform: scale(.95); }
   .btn-notificacao.ativo { border-color: var(--azul); background: #EEF1FF; }
@@ -212,55 +163,30 @@
   .btn-notificacao .badge-notif.visivel { display: flex; }
 
   .resumo {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 20px;
   }
   .card-resumo {
-    background: var(--card);
-    border-radius: 14px;
-    padding: 12px 6px;
-    text-align: center;
-    box-shadow: var(--sombra);
-    border-top: 4px solid var(--azul);
-    min-height: 78px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-    transition: .2s;
-    position: relative;
-    user-select: none;
+    background: var(--card); border-radius: 14px;
+    padding: 12px 6px; text-align: center;
+    box-shadow: var(--sombra); border-top: 4px solid var(--azul);
+    min-height: 78px; display: flex; flex-direction: column;
+    justify-content: center; cursor: pointer; transition: .2s;
+    position: relative; user-select: none;
   }
   .card-resumo:active { transform: scale(.96); }
-  .card-resumo.ativo {
-    background: #EEF1FF;
-    box-shadow: 0 0 0 2px var(--azul), var(--sombra);
-  }
+  .card-resumo.ativo { background: #EEF1FF; box-shadow: 0 0 0 2px var(--azul), var(--sombra); }
   .card-resumo.ativo::after {
-    content: "✓";
-    position: absolute;
-    top: 4px;
-    right: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--azul);
+    content: "✓"; position: absolute; top: 4px; right: 6px;
+    font-size: 11px; font-weight: 700; color: var(--azul);
   }
   .card-resumo .num {
-    font-family: 'Poppins';
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--azul);
-    line-height: 1.1;
+    font-family: 'Poppins'; font-size: 20px; font-weight: 700;
+    color: var(--azul); line-height: 1.1;
   }
   .card-resumo .lbl {
-    font-size: 10px;
-    color: var(--cinza);
-    margin-top: 4px;
-    font-weight: 600;
-    line-height: 1.2;
-    word-break: break-word;
+    font-size: 10px; color: var(--cinza); margin-top: 4px;
+    font-weight: 600; line-height: 1.2; word-break: break-word;
   }
   .card-resumo.cat-bpc { border-top-color: #1F36C7; }
   .card-resumo.cat-bpc .num { color: #1F36C7; }
@@ -282,51 +208,28 @@
   .card-resumo.cat-food .num { color: #00ACC1; }
 
   .filtro-ativo {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    background: #EEF1FF;
-    border: 2px solid var(--azul);
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin-bottom: 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--azul);
+    display: none; align-items: center; justify-content: space-between;
+    background: #EEF1FF; border: 2px solid var(--azul);
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
+    font-size: 13px; font-weight: 600; color: var(--azul);
   }
   .filtro-ativo.visivel { display: flex; }
   .filtro-ativo button {
-    background: var(--azul);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
+    background: var(--azul); color: white; border: none;
+    border-radius: 8px; padding: 6px 10px; font-size: 12px;
+    font-weight: 600; cursor: pointer;
   }
 
   .barra-produtos {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 12px;
   }
   .barra-produtos h2 { font-size: 17px; }
   .btn-excluir-todos {
-    background: #FFEBEE;
-    border: none;
-    color: var(--vermelho);
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: .2s;
+    background: #FFEBEE; border: none; color: var(--vermelho);
+    padding: 8px 12px; border-radius: 10px; font-size: 12px;
+    font-weight: 700; font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; gap: 4px; transition: .2s;
   }
   .btn-excluir-todos:active { transform: scale(.95); }
 
@@ -340,44 +243,26 @@
   .produto.vencido { border-left-color: var(--vermelho); }
 
   .produto .cat-badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: #EEF1FF;
-    color: var(--azul);
-    margin-bottom: 6px;
+    display: inline-block; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    padding: 3px 8px; border-radius: 6px;
+    background: #EEF1FF; color: var(--azul); margin-bottom: 6px;
   }
 
   .produto .nome {
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 4px;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    word-break: break-word;
-    line-height: 1.3;
+    font-weight: 600; font-size: 15px; margin-bottom: 4px;
+    white-space: normal; overflow: visible; text-overflow: clip;
+    word-break: break-word; line-height: 1.3;
   }
 
   .produto .info-destaque {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    margin: 8px 0 6px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; margin: 8px 0 6px;
   }
   .produto .info-destaque .info-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
+    display: flex; align-items: center; gap: 4px;
+    padding: 6px 10px; border-radius: 10px;
+    font-size: 13px; font-weight: 700;
   }
   .produto .info-item.unidades { background: #E8F5E9; color: #2E7D32; }
   .produto .info-item.validade { background: #EEF1FF; color: var(--azul); }
@@ -394,8 +279,7 @@
     background: #FFEBEE; border: none; color: var(--vermelho);
     width: 32px; height: 32px; border-radius: 8px;
     font-size: 16px; cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
-    transition: .2s;
+    align-items: center; justify-content: center; transition: .2s;
   }
   .btn-excluir:active { transform: scale(.9); }
 
@@ -410,22 +294,12 @@
   .btn-editar:active { transform: scale(.9); }
 
   .btn-whatsapp {
-    position: absolute;
-    bottom: 10px;
-    right: 54px;
-    background: #E8F5E9;
-    border: none;
-    color: #25D366;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: .2s;
-    box-shadow: 0 2px 6px rgba(37,211,102,.15);
+    position: absolute; bottom: 10px; right: 54px;
+    background: #E8F5E9; border: none; color: #25D366;
+    width: 36px; height: 36px; border-radius: 10px;
+    font-size: 18px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: .2s; box-shadow: 0 2px 6px rgba(37,211,102,.15);
   }
   .btn-whatsapp:active { transform: scale(.9); }
 
@@ -468,9 +342,7 @@
   .modal h3 { font-size: 19px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
   .modal .fechar { background: #F0F2FA; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; }
 
-  .grupo-cats {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
-  }
+  .grupo-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
   .cat-btn {
     padding: 12px 6px; border: 2px solid #E4E8F5; background: var(--card);
     border-radius: 12px; font-family: inherit; font-size: 12px; font-weight: 600;
@@ -483,17 +355,13 @@
     background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px;
     font-size: 14px; font-weight: 600; z-index: 300; transition: .3s;
     box-shadow: 0 8px 20px rgba(67,160,71,.3);
-    max-width: 90vw;
-    text-align: center;
+    max-width: 90vw; text-align: center;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   .secao-titulo {
-    font-size: 15px;
-    margin: 24px 0 12px;
-    color: var(--texto);
-    padding-bottom: 6px;
-    border-bottom: 2px solid #E4E8F5;
+    font-size: 15px; margin: 24px 0 12px; color: var(--texto);
+    padding-bottom: 6px; border-bottom: 2px solid #E4E8F5;
   }
 
   #scannerModalBg { z-index: 200; }
@@ -504,87 +372,50 @@
   }
   #scannerModalBg h3 { justify-content: space-between; margin-bottom: 12px; }
   #scanner-container {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    border: 2px solid #E4E8F5;
-    border-radius: 14px;
-    overflow: hidden;
-    background: #000;
-    aspect-ratio: 4 / 3;
-    position: relative;
+    width: 100%; max-width: 500px; margin: 0 auto;
+    border: 2px solid #E4E8F5; border-radius: 14px;
+    overflow: hidden; background: #000;
+    aspect-ratio: 4 / 3; position: relative;
   }
   #scanner-container video,
   #scanner-container canvas {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover;
+    width: 100% !important; height: 100% !important; object-fit: cover;
   }
   #scanner-status {
-    margin-top: 12px;
-    font-size: 13px;
-    color: var(--cinza);
-    font-weight: 600;
-    min-height: 20px;
+    margin-top: 12px; font-size: 13px; color: var(--cinza);
+    font-weight: 600; min-height: 20px;
   }
   #scanner-status.erro { color: var(--vermelho); }
   #scanner-status.sucesso { color: var(--verde); }
 
-  /* ===== ESTILOS DA ÁREA DO VENDEDOR ===== */
-  .busca-loja-container {
-    margin-bottom: 16px;
-  }
+  .busca-loja-container { margin-bottom: 16px; }
   .busca-loja-container input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #E4E8F5;
-    border-radius: 14px;
-    font-size: 15px;
-    font-family: inherit;
-    background: var(--card);
-    transition: .2s;
+    width: 100%; padding: 14px 16px; border: 2px solid #E4E8F5;
+    border-radius: 14px; font-size: 15px; font-family: inherit;
+    background: var(--card); transition: .2s;
   }
   .busca-loja-container input:focus {
-    outline: none;
-    border-color: var(--azul-claro);
+    outline: none; border-color: var(--azul-claro);
     box-shadow: 0 0 0 4px rgba(74,99,231,.1);
   }
 
-  /* ===== FILTROS DE PRODUTOS (VENDEDOR) ===== */
   .filtros-vendedor {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-    align-items: center;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 16px; align-items: center;
   }
   .filtros-vendedor select, .filtros-vendedor input {
-    padding: 8px 12px;
-    border: 2px solid #E4E8F5;
-    border-radius: 10px;
-    font-size: 13px;
-    font-family: inherit;
-    background: var(--card);
-    color: var(--texto);
-    flex: 1;
-    min-width: 120px;
-    transition: .2s;
+    padding: 8px 12px; border: 2px solid #E4E8F5;
+    border-radius: 10px; font-size: 13px; font-family: inherit;
+    background: var(--card); color: var(--texto);
+    flex: 1; min-width: 120px; transition: .2s;
   }
   .filtros-vendedor select:focus, .filtros-vendedor input:focus {
-    outline: none;
-    border-color: var(--azul-claro);
+    outline: none; border-color: var(--azul-claro);
   }
   .btn-limpar-filtro {
-    background: #FFEBEE;
-    border: none;
-    color: var(--vermelho);
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: .2s;
+    background: #FFEBEE; border: none; color: var(--vermelho);
+    padding: 8px 12px; border-radius: 10px; font-size: 12px;
+    font-weight: 700; font-family: inherit; cursor: pointer; transition: .2s;
   }
   .btn-limpar-filtro:active { transform: scale(.95); }
 </style>
@@ -594,39 +425,20 @@
 <!-- ========== TELA LOGIN ========== -->
 <div id="telaLogin" class="tela ativa">
   <div class="login-wrap">
-    <!-- LOGO ORIGINAL RESTAURADA -->
     <div class="logo">
       <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
       <p>UniValidade: Sua melhor maneira de controlar a validade dos seus produtos <strong style="color: var(--azul);">Unilever</strong> 💙</p>
     </div>
 
     <div id="camposCadastro" style="display: none;">
-      <div class="campo">
-        <label>Nome do Promotor</label>
-        <input id="inNome" placeholder="Ex: João Silva">
-      </div>
-      <div class="campo">
-        <label>RE</label>
-        <input id="inRE" placeholder="Ex: 12345">
-      </div>
-      <div class="campo">
-        <label>Loja</label>
-        <input id="inLoja" placeholder="Ex: Supermercado Bom Preço">
-      </div>
-      <div class="campo">
-        <label>Cidade</label>
-        <input id="inCidade" placeholder="Ex: São Paulo">
-      </div>
+      <div class="campo"><label>Nome do Promotor</label><input id="inNome" placeholder="Ex: João Silva"></div>
+      <div class="campo"><label>RE</label><input id="inRE" placeholder="Ex: 12345"></div>
+      <div class="campo"><label>Loja</label><input id="inLoja" placeholder="Ex: Supermercado Bom Preço"></div>
+      <div class="campo"><label>Cidade</label><input id="inCidade" placeholder="Ex: São Paulo"></div>
     </div>
 
-    <div class="campo">
-      <label>E-mail</label>
-      <input id="inEmail" type="email" placeholder="seu@email.com">
-    </div>
-    <div class="campo">
-      <label>Senha</label>
-      <input id="inSenha" type="password" placeholder="Sua senha">
-    </div>
+    <div class="campo"><label>E-mail</label><input id="inEmail" type="email" placeholder="seu@email.com"></div>
+    <div class="campo"><label>Senha</label><input id="inSenha" type="password" placeholder="Sua senha"></div>
 
     <button class="btn" id="btnAuth" onclick="fazerLogin()">Entrar no Sistema →</button>
 
@@ -642,11 +454,10 @@
 
 <!-- ========== TELA DASHBOARD ========== -->
 <div id="telaDash" class="tela">
-  <!-- HEADER DO DASHBOARD (LOGO PADRONIZADA E CENTRALIZADA) -->
   <div class="logo-vendedor" style="margin-bottom: 20px;">
     <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
   </div>
-  
+
   <div class="header-topo">
     <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%; gap:12px;">
       <div>
@@ -656,8 +467,7 @@
         </div>
       </div>
       <button class="btn-notificacao" id="btnNotificacao" onclick="toggleNotificacoes()" title="Ativar notificações">
-        🔔
-        <span class="badge-notif" id="badgeNotif">0</span>
+        🔔 <span class="badge-notif" id="badgeNotif">0</span>
       </button>
     </div>
   </div>
@@ -679,9 +489,7 @@
 
   <div class="barra-produtos">
     <h2>Produtos cadastrados</h2>
-    <button class="btn-excluir-todos" onclick="excluirTodosProdutos()" title="Excluir todos os produtos">
-      🗑️ Excluir todos
-    </button>
+    <button class="btn-excluir-todos" onclick="excluirTodosProdutos()" title="Excluir todos os produtos">🗑️ Excluir todos</button>
   </div>
   <div id="listaProdutos"></div>
 </div>
@@ -693,46 +501,24 @@
     <p class="sub">Altere suas informações (o e-mail não pode ser modificado)</p>
   </div>
 
-  <div class="campo">
-    <label>Nome do Promotor</label>
-    <input id="perfilNome" placeholder="Ex: João Silva">
-  </div>
-  <div class="campo">
-    <label>RE</label>
-    <input id="perfilRE" placeholder="Ex: 12345">
-  </div>
-  <div class="campo">
-    <label>Loja</label>
-    <input id="perfilLoja" placeholder="Ex: Supermercado Bom Preço">
-  </div>
-  <div class="campo">
-    <label>Cidade</label>
-    <input id="perfilCidade" placeholder="Ex: São Paulo">
-  </div>
-  <div class="campo">
-    <label>E-mail (não editável)</label>
-    <input id="perfilEmail" type="email" disabled>
-  </div>
+  <div class="campo"><label>Nome do Promotor</label><input id="perfilNome" placeholder="Ex: João Silva"></div>
+  <div class="campo"><label>RE</label><input id="perfilRE" placeholder="Ex: 12345"></div>
+  <div class="campo"><label>Loja</label><input id="perfilLoja" placeholder="Ex: Supermercado Bom Preço"></div>
+  <div class="campo"><label>Cidade</label><input id="perfilCidade" placeholder="Ex: São Paulo"></div>
+  <div class="campo"><label>E-mail (não editável)</label><input id="perfilEmail" type="email" disabled></div>
 
   <button class="btn" onclick="salvarPerfil()">💾 Salvar Alterações</button>
 
   <h3 class="secao-titulo">🔒 Alterar Senha</h3>
 
-  <div class="campo">
-    <label>Nova Senha</label>
-    <input id="perfilNovaSenha" type="password" placeholder="Mínimo 6 caracteres">
-  </div>
-  <div class="campo">
-    <label>Confirmar Nova Senha</label>
-    <input id="perfilNovaSenha2" type="password" placeholder="Repita a nova senha">
-  </div>
+  <div class="campo"><label>Nova Senha</label><input id="perfilNovaSenha" type="password" placeholder="Mínimo 6 caracteres"></div>
+  <div class="campo"><label>Confirmar Nova Senha</label><input id="perfilNovaSenha2" type="password" placeholder="Repita a nova senha"></div>
 
   <button class="btn secundario" onclick="alterarSenhaPerfil()">🔑 Alterar Senha</button>
 </div>
 
 <!-- ========== TELA ÁREA DO VENDEDOR ========== -->
 <div id="telaVendedor" class="tela">
-  <!-- LOGO DO VENDEDOR -->
   <div class="logo-vendedor">
     <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
   </div>
@@ -751,13 +537,13 @@
       <h2>Lojas Cadastradas</h2>
       <p class="sub">Selecione a loja que deseja consultar.</p>
     </div>
-    
+
     <div class="busca-loja-container">
       <input id="inBuscaLoja" placeholder="Buscar loja..." oninput="filtrarLojasVendedor(this.value)">
     </div>
 
     <div id="listaDeLojas"></div>
-    
+
     <button class="btn secundario" onclick="sairVendedor()" style="margin-top: 20px;">Sair da Área do Vendedor</button>
   </div>
 
@@ -792,15 +578,9 @@
 
 <!-- ========== NAV INFERIOR ========== -->
 <div class="nav" id="nav" style="display:none">
-  <button id="navInicio" class="ativo" onclick="irParaInicio()">
-    <span class="icone">🏠</span> Início
-  </button>
-  <button id="navPerfil" onclick="irParaPerfil()">
-    <span class="icone">👤</span> Perfil
-  </button>
-  <button onclick="sair()">
-    <span class="icone">🚪</span> Sair
-  </button>
+  <button id="navInicio" class="ativo" onclick="irParaInicio()"><span class="icone">🏠</span> Início</button>
+  <button id="navPerfil" onclick="irParaPerfil()"><span class="icone">👤</span> Perfil</button>
+  <button onclick="sair()"><span class="icone">🚪</span> Sair</button>
 </div>
 
 <!-- ========== MODAL CADASTRO ========== -->
@@ -816,35 +596,17 @@
       </div>
     </div>
 
-    <div class="campo">
-      <label>Nome do Produto</label>
-      <input id="inProduto" placeholder="Ex: Maionese Hellmann's">
-    </div>
-
-    <div class="campo">
-      <label>Marca</label>
-      <input id="inMarca" placeholder="Ex: Hellmann's">
-    </div>
-
-    <div class="campo">
-      <label>Gramatura / Volume / Unidades</label>
-      <input id="inGramatura" placeholder="Ex: 500g, 1kg, 30 unidades">
-    </div>
-
-    <div class="campo">
-      <label>Quantidade em estoque</label>
-      <input id="inQuantidade" type="number" min="1" value="1">
-    </div>
+    <div class="campo"><label>Nome do Produto</label><input id="inProduto" placeholder="Ex: Maionese Hellmann's"></div>
+    <div class="campo"><label>Marca</label><input id="inMarca" placeholder="Ex: Hellmann's"></div>
+    <div class="campo"><label>Gramatura / Volume / Unidades</label><input id="inGramatura" placeholder="Ex: 500g, 1kg, 30 unidades"></div>
+    <div class="campo"><label>Quantidade em estoque</label><input id="inQuantidade" type="number" min="1" value="1"></div>
 
     <div class="campo">
       <label>Categoria</label>
       <div class="grupo-cats" id="grupoCats"></div>
     </div>
 
-    <div class="campo">
-      <label>Data de Validade</label>
-      <input type="date" id="inValidade">
-    </div>
+    <div class="campo"><label>Data de Validade</label><input type="date" id="inValidade"></div>
 
     <button class="btn" onclick="salvarProduto()">💾 Salvar Produto</button>
   </div>
@@ -864,35 +626,17 @@
   <div class="modal">
     <h3>Editar Produto <button class="fechar" onclick="fecharEdicao()">✕</button></h3>
 
-    <div class="campo">
-      <label>Nome do Produto</label>
-      <input id="editProduto" placeholder="Ex: Maionese Hellmann's">
-    </div>
-
-    <div class="campo">
-      <label>Marca</label>
-      <input id="editMarca" placeholder="Ex: Hellmann's">
-    </div>
-
-    <div class="campo">
-      <label>Gramatura / Volume / Unidades</label>
-      <input id="editGramatura" placeholder="Ex: 500g, 1kg, 30 unidades">
-    </div>
-
-    <div class="campo">
-      <label>Quantidade em estoque</label>
-      <input id="editQuantidade" type="number" min="1">
-    </div>
+    <div class="campo"><label>Nome do Produto</label><input id="editProduto" placeholder="Ex: Maionese Hellmann's"></div>
+    <div class="campo"><label>Marca</label><input id="editMarca" placeholder="Ex: Hellmann's"></div>
+    <div class="campo"><label>Gramatura / Volume / Unidades</label><input id="editGramatura" placeholder="Ex: 500g, 1kg, 30 unidades"></div>
+    <div class="campo"><label>Quantidade em estoque</label><input id="editQuantidade" type="number" min="1"></div>
 
     <div class="campo">
       <label>Categoria</label>
       <div class="grupo-cats" id="grupoCatsEdicao"></div>
     </div>
 
-    <div class="campo">
-      <label>Data de Validade</label>
-      <input type="date" id="editValidade">
-    </div>
+    <div class="campo"><label>Data de Validade</label><input type="date" id="editValidade"></div>
 
     <button class="btn" onclick="salvarEdicao()">💾 Salvar Alterações</button>
   </div>
@@ -910,30 +654,58 @@ const supabaseClient = createClient(
   'sb_publishable_Ef3dvtXXkDdN_Pm3lZjTfw_IAkLzr35'
 );
 
-// ========== CONFIGURAÇÃO DA PLANILHA ==========
+// ========== CONFIGURAÇÃO DAS PLANILHAS ==========
+// Planilha 1: Foods-2 (formato: ,EAN,PLU,DESCRIÇÃO,GRAMATURA,MARCA)
 const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6n9cNCwf0qAqFkyGNWRMF86C6nzUKLayvwRyd8Oo6E2sd9jkgA7THIOkwmvSNLGKry4zpg8P5z59O/pub?gid=1564410980&single=true&output=csv';
+
+// Planilha 2: HC site (formato: EAN,NOME,MARCA,GRAMATURA)
+const URL_CSV_HC = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2-LjZLhOTL0KOXrXvwz-emqN8yEACxHiFW-6sLlM9KPfBrKIB9-R_YkfpbpH4rHrl6tWDgDnglh2o/pub?output=csv';
 
 let baseProdutos = {};
 
-// ========== CARREGAMENTO DA BASE ==========
+// ========== CARREGAMENTO DAS BASES ==========
 async function carregarBaseProdutos() {
+  baseProdutos = {};
+
+  // ---- 1) Planilha principal (Foods-2) ----
   try {
     const resp = await fetch(URL_CSV, { cache: 'no-store' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const csv = await resp.text();
-    baseProdutos = csvParaBase(csv);
-    console.log('✅ Base de produtos carregada:', Object.keys(baseProdutos).length, 'itens');
+    const base1 = csvParaBase(csv);
+    Object.assign(baseProdutos, base1);
+    console.log('✅ Planilha Foods-2:', Object.keys(base1).length, 'itens');
   } catch (err) {
-    console.error('❌ Erro ao carregar base de produtos:', err);
+    console.error('❌ Erro na planilha Foods-2:', err);
   }
+
+  // ---- 2) Planilha HC site ----
+  try {
+    const resp = await fetch(URL_CSV_HC, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const csv = await resp.text();
+    const base2 = csvParaBaseHC(csv);
+    let novos = 0, conflitos = 0;
+    for (const ean in base2) {
+      if (baseProdutos[ean]) { conflitos++; continue; } // Foods-2 tem prioridade
+      baseProdutos[ean] = base2[ean];
+      novos++;
+    }
+    console.log('✅ Planilha HC:', novos, 'itens adicionados (' + conflitos + ' conflitos ignorados)');
+  } catch (err) {
+    console.error('❌ Erro na planilha HC:', err);
+  }
+
+  console.log('✅ Base TOTAL:', Object.keys(baseProdutos).length, 'itens');
 }
 
+// Parser para a planilha Foods-2 (6 colunas: ,EAN,PLU,DESCRIÇÃO,GRAMATURA,MARCA)
 function csvParaBase(csv) {
   const linhas = parseCSV(csv);
   const base = {};
   for (let i = 0; i < linhas.length; i++) {
     const l = linhas[i];
-    if (!l || l.length < 4) continue;
+    if (!l || l.length < 6) continue;
 
     const ean       = (l[1] || '').trim();
     const plu       = (l[2] || '').trim();
@@ -950,6 +722,36 @@ function csvParaBase(csv) {
       descricao: descricao || '(sem descrição)',
       gramatura: gramatura || null,
       marca: marca || null
+    };
+  }
+  return base;
+}
+
+// Parser para a planilha HC site (4 colunas: EAN,NOME,MARCA,GRAMATURA)
+function csvParaBaseHC(csv) {
+  const linhas = parseCSV(csv);
+  const base = {};
+
+  for (let i = 0; i < linhas.length; i++) {
+    const l = linhas[i];
+    if (!l || l.length < 4) continue;
+
+    // Ignora cabeçalho
+    if (i === 0 && (l[0] || '').trim().toUpperCase() === 'EAN') continue;
+
+    const ean       = (l[0] || '').trim();
+    const descricao = (l[1] || '').trim();
+    const marca     = (l[2] || '').trim();
+    const gramatura = (l[3] || '').trim();
+
+    if (!/^\d{8,14}$/.test(ean)) continue;
+    if (base[ean]) continue;
+
+    base[ean] = {
+      descricao: descricao || '(sem descrição)',
+      marca: marca || null,
+      gramatura: gramatura || null,
+      plu: null
     };
   }
   return base;
@@ -990,7 +792,7 @@ function aplicarEANNoFormulario(ean, origem = 'manual') {
     if (origem === 'camera') {
       mostrarToast('Código não encontrado. Digite manualmente.', '#E53935');
     } else {
-      mostrarToast('❌ Produto não encontrado na planilha', '#E53935');
+      mostrarToast('❌ Produto não encontrado nas planilhas', '#E53935');
     }
     return false;
   }
@@ -1037,7 +839,6 @@ let notificacoesAtivas = false;
 let notificacoesJaEnviadas = {};
 let oneSignalLogado = false;
 
-// Vincula o usuário logado ao OneSignal
 async function vincularOneSignal(userId) {
   if (oneSignalLogado) return;
   try {
@@ -1898,7 +1699,6 @@ function renderProduto(p) {
 
     <div class="dias ${cls}">${textoDias(dias)}</div>
 
-    <!-- NOVO BOTÃO DO WHATSAPP -->
     <button class="btn-whatsapp" onclick="enviarWhatsApp('${p.nome.replace(/'/g, "\\'")}', ${qtd}, '${dataFmt}', '${promotor.loja.replace(/'/g, "\\'")}', '${promotor.cidade.replace(/'/g, "\\'")}')" title="Enviar via WhatsApp">
       💬
     </button>
@@ -1967,7 +1767,7 @@ async function validarCodigoVendedor() {
     document.getElementById('vendedorAuth').style.display = 'none';
     document.getElementById('vendedorPainel').style.display = 'block';
     mostrarToast('✓ Acesso liberado!');
-    
+
     lojasVendedorCache = data.lojas || [];
     document.getElementById('inBuscaLoja').value = '';
     renderizarLojasVendedor(lojasVendedorCache);
@@ -1981,7 +1781,6 @@ async function validarCodigoVendedor() {
   }
 }
 
-// NOVO: Filtro de lojas por busca
 function filtrarLojasVendedor(termo) {
   const t = (termo || '').toLowerCase();
   const filtradas = lojasVendedorCache.filter(l =>
@@ -2016,13 +1815,13 @@ async function abrirLojaVendedor(userId, nomeLoja, cidade) {
   document.getElementById('vendedorDetalhes').style.display = 'block';
   document.getElementById('nomeLojaDetalhe').textContent = nomeLoja;
   document.getElementById('cidadeLojaDetalhe').textContent = cidade;
-  
+
   const lista = document.getElementById('listaProdutosVendedor');
   lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Carregando produtos...</p>';
 
   try {
     const codigo = localStorage.getItem('univalidade_vendedor');
-    
+
     const { data, error } = await supabaseClient.functions.invoke('listar-lojas-vendedor', {
       body: { codigo: codigo, acao: 'buscar_produtos', userId: userId }
     });
@@ -2032,13 +1831,11 @@ async function abrirLojaVendedor(userId, nomeLoja, cidade) {
 
     produtosVendedorCache = data.produtos || [];
 
-    // Preenche o filtro de categorias
     const selectCat = document.getElementById('filtroCategoriaVendedor');
     const catsUnicas = [...new Set(produtosVendedorCache.map(p => p.categoria).filter(Boolean))].sort();
     selectCat.innerHTML = '<option value="">Categoria (todas)</option>' +
       catsUnicas.map(c => `<option value="${c}">${c}</option>`).join('');
 
-    // Limpa os outros filtros
     document.getElementById('filtroMarcaVendedor').value = '';
     document.getElementById('filtroValidadeVendedor').value = '';
 
@@ -2051,7 +1848,6 @@ async function abrirLojaVendedor(userId, nomeLoja, cidade) {
   }
 }
 
-// NOVO: Aplica os filtros de categoria, marca e validade
 function aplicarFiltrosVendedor() {
   const cat = document.getElementById('filtroCategoriaVendedor').value;
   const marca = document.getElementById('filtroMarcaVendedor').value.trim().toLowerCase();
@@ -2091,7 +1887,7 @@ function limparFiltrosVendedor() {
 
 function renderizarProdutosVendedor(prods) {
   const lista = document.getElementById('listaProdutosVendedor');
-  
+
   if (!prods || prods.length === 0) {
     lista.innerHTML = '<p style="text-align: center; color: var(--cinza);">Nenhum produto encontrado com esses filtros.</p>';
     return;
@@ -2139,7 +1935,8 @@ window.onload = async () => {
   montarCategorias();
   configurarBuscaManualEAN();
 
-  carregarBaseProdutos();
+  // Carrega as DUAS planilhas antes de qualquer cadastro
+  await carregarBaseProdutos();
 
   if ('Notification' in window && Notification.permission === 'granted') {
     const pref = localStorage.getItem('univalidade_notif');
