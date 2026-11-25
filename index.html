@@ -350,14 +350,39 @@
   }
   .cat-btn.sel { border-color: var(--azul); background: #EEF1FF; color: var(--azul); }
 
+  /* ===== TOAST CORRIGIDO (mobile-safe) ===== */
   .toast {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-    background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px;
-    font-size: 14px; font-weight: 600; z-index: 300; transition: .3s;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120%);
+    background: var(--verde);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 300;
+    transition: transform .3s ease, opacity .3s ease;
     box-shadow: 0 8px 20px rgba(67,160,71,.3);
-    max-width: 90vw; text-align: center;
+    max-width: 90vw;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
   }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  @media (max-width: 480px) {
+    .toast {
+      top: 12px;
+      font-size: 13px;
+      padding: 10px 16px;
+      max-width: 92vw;
+    }
+  }
 
   .secao-titulo {
     font-size: 15px; margin: 24px 0 12px; color: var(--texto);
@@ -655,11 +680,8 @@ const supabaseClient = createClient(
 );
 
 // ========== CONFIGURAÇÃO DAS PLANILHAS ==========
-// Planilha 1: Foods-2 (formato: ,EAN,PLU,DESCRIÇÃO,GRAMATURA,MARCA)
 const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6n9cNCwf0qAqFkyGNWRMF86C6nzUKLayvwRyd8Oo6E2sd9jkgA7THIOkwmvSNLGKry4zpg8P5z59O/pub?gid=1564410980&single=true&output=csv';
-
-// Planilha 2: HC site (formato: EAN,NOME,MARCA,GRAMATURA)
-const URL_CSV_HC = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-2Jcip2TFQy_HS2OBPv1IFx2qF7cLE1LHtSk1zh3uBHcYbWUL1Uh8RrwRX-pld4SrUcMOr1uzsujy/pub?output=csv';
+const URL_CSV_HC = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2-LjZLhOTL0KOXrXvwz-emqN8yEACxHiFW-6sLlM9KPfBrKIB9-R_YkfpbpH4rHrl6tWDgDnglh2o/pub?output=csv';
 
 let baseProdutos = {};
 
@@ -687,7 +709,7 @@ async function carregarBaseProdutos() {
     const base2 = csvParaBaseHC(csv);
     let novos = 0, conflitos = 0;
     for (const ean in base2) {
-      if (baseProdutos[ean]) { conflitos++; continue; } // Foods-2 tem prioridade
+      if (baseProdutos[ean]) { conflitos++; continue; }
       baseProdutos[ean] = base2[ean];
       novos++;
     }
@@ -699,7 +721,6 @@ async function carregarBaseProdutos() {
   console.log('✅ Base TOTAL:', Object.keys(baseProdutos).length, 'itens');
 }
 
-// Parser para a planilha Foods-2 (6 colunas: ,EAN,PLU,DESCRIÇÃO,GRAMATURA,MARCA)
 function csvParaBase(csv) {
   const linhas = parseCSV(csv);
   const base = {};
@@ -727,7 +748,6 @@ function csvParaBase(csv) {
   return base;
 }
 
-// Parser para a planilha HC site (4 colunas: EAN,NOME,MARCA,GRAMATURA)
 function csvParaBaseHC(csv) {
   const linhas = parseCSV(csv);
   const base = {};
@@ -736,7 +756,6 @@ function csvParaBaseHC(csv) {
     const l = linhas[i];
     if (!l || l.length < 4) continue;
 
-    // Ignora cabeçalho
     if (i === 0 && (l[0] || '').trim().toUpperCase() === 'EAN') continue;
 
     const ean       = (l[0] || '').trim();
@@ -1561,6 +1580,13 @@ function aoDetectarEAN(codigo) {
 }
 
 function fecharScanner() {
+  // Esconde qualquer toast pendente ao fechar o scanner
+  const t = document.getElementById('toast');
+  if (t) {
+    t.classList.remove('show');
+    if (t._timer) { clearTimeout(t._timer); t._timer = null; }
+  }
+
   scannerAtivo = false;
   scannerModalBg.classList.remove('aberto');
 
@@ -1921,13 +1947,30 @@ function sairVendedor() {
   abrirAreaVendedor();
 }
 
+// ========== TOAST (mobile-safe) ==========
 function mostrarToast(msg, cor = '#43A047') {
   const t = document.getElementById('toast');
+  if (!t) return;
+
+  // Limpa timer anterior
+  if (t._timer) {
+    clearTimeout(t._timer);
+    t._timer = null;
+  }
+
   t.textContent = msg;
   t.style.background = cor;
+
+  // Força reflow para reiniciar a animação caso já esteja visível
+  t.classList.remove('show');
+  void t.offsetWidth;
+
   t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+
+  t._timer = setTimeout(() => {
+    t.classList.remove('show');
+    t._timer = null;
+  }, 2800);
 }
 
 // ========== INICIALIZAÇÃO ==========
@@ -1935,7 +1978,6 @@ window.onload = async () => {
   montarCategorias();
   configurarBuscaManualEAN();
 
-  // Carrega as DUAS planilhas antes de qualquer cadastro
   await carregarBaseProdutos();
 
   if ('Notification' in window && Notification.permission === 'granted') {
